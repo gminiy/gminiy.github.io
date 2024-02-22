@@ -1,6 +1,6 @@
 ---
 layout: list
-title: Nestjs
+title: NestJs
 slug: nestjs
 category: dev
 menu: false
