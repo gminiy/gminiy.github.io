@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Decorator"
+title: "[NestJs] Decorator"
 date: 2024-02-23
 categories: dev
 tags: nestjs
