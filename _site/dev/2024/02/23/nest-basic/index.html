@@ -35,7 +35,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="format-detection" content="telephone=no">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
-<meta property="og:title" content="DEV">
+<meta property="og:title" content="Nestjs">
 <meta property="og:type" content="article">
 
 
@@ -49,13 +49,29 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 
 
 
-  <title>DEV &middot; Gmin.Y Blog</title>
+  <title>Nestjs &middot; Gmin.Y Blog</title>
 
 
 
-<meta name="description" content="개발에 관련된 내용 공유
+<meta name="description" content="
+  
+    1. NestJS 장점
+    2. NestJS 설치
+    3. NestJS 보일러플레이트
+    4. 서버 실행
+  
+
+
 ">
-<meta property="og:description" content="개발에 관련된 내용 공유
+<meta property="og:description" content="
+  
+    1. NestJS 장점
+    2. NestJS 설치
+    3. NestJS 보일러플레이트
+    4. 서버 실행
+  
+
+
 ">
 
 
@@ -67,8 +83,8 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <!-- =============== -->
 <!-- LINKS           -->
 <!-- =============== -->
-<link rel="canonical" href="http://localhost:4000/category/dev/">
-<meta property="og:url" content="http://localhost:4000/category/dev/">
+<link rel="canonical" href="http://localhost:4000/dev/2024/02/23/nest-basic/">
+<meta property="og:url" content="http://localhost:4000/dev/2024/02/23/nest-basic/">
 <meta name="google-site-verification" content="g4I-a_du23AFdfLFV2vuKYLo_phz8igXQAF3pHc57wA" />
 
 <!-- Google tag (gtag.js) -->
@@ -85,6 +101,8 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 
 
 
+
+  <link rel="next" href="http://localhost:4000/dev/2024/02/24/nest-decorator/">
 
 
 <link rel="apple-touch-icon" href="http://localhost:4000/apple-touch-icon.png">
@@ -176,37 +194,230 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   <div class="fade-in">
     <main id="_main" class="content" role="main" data-color="#4f86aa" data-image="/assets/img/main-left.jpeg">
       <!--<div style="text-align: center;">&lt;!&ndash; 조회수 노출 HITS &ndash;&gt;
-        <a href="http://hits.dwyl.com/localhost:4000/category/dev/"
+        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/02/23/nest-basic/"
            target="_blank">
-          <img src="http://hits.dwyl.com/localhost:4000/category/dev/.svg" /></a>
+          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/02/23/nest-basic/.svg" /></a>
       </div>-->
+      
+
+<article id="post-dev/2024/02/23/nest-basic" class="post" role="article">
+  <header>
+    <h1 class="post-title">
+      
+        Nestjs
+      
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-02-23T00:00:00+09:00">2024-02-23</time>
       
 
 
 
-  <header>
-    <h1 class="page-title">DEV</h1>
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
     
-  
-  
-<p class="message">개발에 관련된 내용 공유</p>
-
-
+  <div class="hr" style="padding-bottom:0"></div>
 
 
   </header>
-  <hr class="sr-only"/>
-
-
+  
 
   
+    <div class="markdown-body">
+
+
+<br/>
+      <blockquote>
+  <ul>
+    <li><a href="#1-nestjs-장점">1. NestJS 장점</a></li>
+    <li><a href="#2-nestjs-설치">2. NestJS 설치</a></li>
+    <li><a href="#3-nestjs-보일러플레이트">3. NestJS 보일러플레이트</a></li>
+    <li><a href="#4-서버-실행">4. 서버 실행</a></li>
+  </ul>
+</blockquote>
+
+<hr />
+
+<h1 id="1-nestjs-장점">1. NestJS 장점</h1>
+
+<p>NestJS는 <strong>Express 또는 Fastify 프레임워크</strong>를 래핑하여 동작한다. Fastify는 Express보다 벤치마크 결과 2배 빠른 속도를 자랑한다. NestJS는 Fastify의 빠른 속도와 Express의 높은 호환성을 갖고자 한다.</p>
+
+<p>Node.js 의 과도한 유연함으로 인해 발생하는 문제점을 해결하기 위해 <strong>데이터베이스. 객체 관계 매핑(ORM), 설정, 유효성 검사</strong> 등의 기능을 기본으로 제공한다. 그러면서도 필요한 라이브러리를 쉽게 설치하여 사용하는 Node.JS 장점은 그대로 가지고 있다.</p>
+
+<p><strong>모듈/컴포넌트 기반</strong>으로 프로그램을 작성함으로써 재사용성을 높인다. 또 <strong>제어 반전, 의존성 주입, 관점 지향 프로그래밍</strong> 같은 객체 지향 개념을 도입했다. 기본으로 <strong>타입스크립트</strong>를 채택하고 있다.</p>
+
+<hr />
+
+<h1 id="2-nestjs-설치">2. NestJS 설치</h1>
+
+<p>Mac 버전으로 설명한다.</p>
+
+<ul>
+  <li>NodeJS 먼저 설치한다.</li>
+</ul>
+
+<p><a href="https://nodejs.org/en">https://nodejs.org/en</a></p>
+
+<ul>
+  <li>@nestjs/cli 를 npm으로 설치한다.</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm i <span class="nt">-g</span> @nestjs/cli
+</code></pre></div></div>
+
+<ul>
+  <li>프로젝트를 생성한다.</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nest new project-name
+</code></pre></div></div>
+
+<h1 id="3-nestjs-보일러플레이트">3. NestJS 보일러플레이트</h1>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>├── README.md
+├── nest-cli.json
+├── package-lock.json
+├── package.json
+├── src
+│   ├── app.controller.spec.ts
+│   ├── app.controller.ts
+│   ├── app.module.ts
+│   ├── app.service.ts
+│   └── main.ts
+├── <span class="nb">test</span>
+│   ├── app.e2e-spec.ts
+│   └── jest-e2e.json
+├── tsconfig.build.json
+└── tsconfig.json
+</code></pre></div></div>
+
+<h1 id="4-서버-실행">4. 서버 실행</h1>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm i
+<span class="nv">$ </span>npm run start:dev
+
+<span class="o">[</span>5:51:40 PM] Starting compilation <span class="k">in </span>watch mode...
+
+<span class="o">[</span>5:51:41 PM] Found 0 errors. Watching <span class="k">for </span>file changes.
+
+<span class="o">[</span>Nest] 32419  - 02/25/2023, 5:51:42 PM     LOG <span class="o">[</span>NestFactory] Starting Nest application...
+<span class="o">[</span>Nest] 32419  - 02/25/2023, 5:51:42 PM     LOG <span class="o">[</span>InstanceLoader] AppModule dependencies initialized +10ms
+<span class="o">[</span>Nest] 32419  - 02/25/2023, 5:51:42 PM     LOG <span class="o">[</span>RoutesResolver] AppController <span class="o">{</span>/<span class="o">}</span>: +4ms
+<span class="o">[</span>Nest] 32419  - 02/25/2023, 5:51:42 PM     LOG <span class="o">[</span>RouterExplorer] Mapped <span class="o">{</span>/, GET<span class="o">}</span> route +2ms
+<span class="o">[</span>Nest] 32419  - 02/25/2023, 5:51:42 PM     LOG <span class="o">[</span>NestApplication] Nest application successfully started +2ms
+</code></pre></div></div>
+
+<p>localhost에서 구동된 것을 확인할 수 있다. 포트는 기본으로 main.ts 에서 3000번으로 설정되어 있다.</p>
+
+<hr />
+
+<p><em>본 포스트는 한용재 저자의 <strong>NestJS로 배우는 백엔드 프로그래밍</strong>을 기반으로 스터디하며 정리한 내용들입니다.</em></p>
+
+<ul>
+  <li><a href="http://www.yes24.com/Product/Goods/115850682">NestJS로 배우는 백엔드 프로그래밍</a></li>
+</ul>
+
+      <br/>
+      <br/>
+    </div>
+    <script>
+
+    </script>
+  
+
+</article>
+
+  <hr class="dingbat" />
+
+  <div class="share">
+      <h2>Share this post</h2>
+      <div class="share-body">
+        <a href="http://twitter.com/share?text=Nestjs&amp;url=http://localhost:4000/dev/2024/02/23/nest-basic/"
+    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <span class="icon-twitter">
+            </span>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/02/23/nest-basic/"
+    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="icon-facebook">
+            </span>
+        </a>
+    </div>
+  </div>
+  <br/>
+
+
+
+
+
+
+  <aside class="author" role="complementary">
+    <div class="author">
+  <h2 class="page-title hr">
+    About
+  </h2>
+<div class="author-body">
   
     
-    <h2 id="y2024" class="hr">2024</h2>
-    <ul class="related-posts">
+  
+
+  
+
+  <img
+    src="/assets/img/me.jpg"
+    class="me"
+    alt="gmin"
+    srcset="/assets/img/me.jpg 1x,/assets/img/me.jpg 2x"
     
+  />
+
+
   
-  
+  <div class="author-body-description">
+    <p>기술을 통해 사람을 돕고 세상을 이롭게 하는 삶을 지향합니다.</p>
+
+  </div>
+</div>
+</div>
+
+  </aside>
+
+
+
+
+
+<aside class="related" role="complementary">
+  <h2 class="hr">Related Posts</h2>
+
+  <ul class="related-posts">
+    
+      
+      
+      
+        
+        
+          
 
 
 <li class="h4">
@@ -218,23 +429,14 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/23/nest-basic/" data-flip="title">
-    <span>Nestjs</span>
-  </a>
-  <small><time datetime="2024-02-23T00:00:00+09:00">
-    2024-02-23
-  </time></small>
-</li>
-
+        
+      
+        
+          
+          
+    
   </ul>
+</aside>
 
 
 
@@ -283,7 +485,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
     <li>
       <input type="checkbox" id="list-item-1"/>
       <div  class="list-wrapper">
-      <a class="sidebar-nav-item active" href="/category/dev/">DEV</a>
+      <a class="sidebar-nav-item" href="/category/dev/">DEV</a>
        <label class="folder" for="list-item-1">▾</label>
     </div>
     <div>

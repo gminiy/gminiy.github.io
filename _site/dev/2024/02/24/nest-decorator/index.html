@@ -35,7 +35,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="format-detection" content="telephone=no">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
-<meta property="og:title" content="DEV">
+<meta property="og:title" content="Decorator">
 <meta property="og:type" content="article">
 
 
@@ -49,13 +49,31 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 
 
 
-  <title>DEV &middot; Gmin.Y Blog</title>
+  <title>Decorator &middot; Gmin.Y Blog</title>
 
 
 
-<meta name="description" content="개발에 관련된 내용 공유
+<meta name="description" content="
+  
+    1. 설정
+    2. 사용 예시
+    3. Decorator Factory
+    4. Decorator 합성
+    5. Decorator 역할 요약
+  
+
+
 ">
-<meta property="og:description" content="개발에 관련된 내용 공유
+<meta property="og:description" content="
+  
+    1. 설정
+    2. 사용 예시
+    3. Decorator Factory
+    4. Decorator 합성
+    5. Decorator 역할 요약
+  
+
+
 ">
 
 
@@ -67,8 +85,8 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <!-- =============== -->
 <!-- LINKS           -->
 <!-- =============== -->
-<link rel="canonical" href="http://localhost:4000/category/dev/">
-<meta property="og:url" content="http://localhost:4000/category/dev/">
+<link rel="canonical" href="http://localhost:4000/dev/2024/02/24/nest-decorator/">
+<meta property="og:url" content="http://localhost:4000/dev/2024/02/24/nest-decorator/">
 <meta name="google-site-verification" content="g4I-a_du23AFdfLFV2vuKYLo_phz8igXQAF3pHc57wA" />
 
 <!-- Google tag (gtag.js) -->
@@ -83,6 +101,8 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 
 <link rel="alternate" type="application/atom+xml" title="Gmin.Y Blog Feed" href="http://localhost:4000/feed.xml">
 
+
+  <link rel="prev" href="http://localhost:4000/dev/2024/02/23/nest-basic/">
 
 
 
@@ -176,53 +196,318 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   <div class="fade-in">
     <main id="_main" class="content" role="main" data-color="#4f86aa" data-image="/assets/img/main-left.jpeg">
       <!--<div style="text-align: center;">&lt;!&ndash; 조회수 노출 HITS &ndash;&gt;
-        <a href="http://hits.dwyl.com/localhost:4000/category/dev/"
+        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/02/24/nest-decorator/"
            target="_blank">
-          <img src="http://hits.dwyl.com/localhost:4000/category/dev/.svg" /></a>
+          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/02/24/nest-decorator/.svg" /></a>
       </div>-->
+      
+
+<article id="post-dev/2024/02/24/nest-decorator" class="post" role="article">
+  <header>
+    <h1 class="post-title">
+      
+        Decorator
+      
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-02-24T00:00:00+09:00">2024-02-24</time>
       
 
 
 
-  <header>
-    <h1 class="page-title">DEV</h1>
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
     
-  
-  
-<p class="message">개발에 관련된 내용 공유</p>
-
-
+  <div class="hr" style="padding-bottom:0"></div>
 
 
   </header>
-  <hr class="sr-only"/>
-
-
+  
 
   
+    <div class="markdown-body">
+
+
+<br/>
+      <blockquote>
+  <ul>
+    <li><a href="#1-설정">1. 설정</a></li>
+    <li><a href="#2-사용-예시">2. 사용 예시</a></li>
+    <li><a href="#3-decorator-factory">3. Decorator Factory</a></li>
+    <li><a href="#4-decorator-합성">4. Decorator 합성</a></li>
+    <li><a href="#5-decorator-역할-요약">5. Decorator 역할 요약</a></li>
+  </ul>
+</blockquote>
+
+<hr />
+
+<p>Nest는 Decorator를 적극 활용한다. Decorator를 잘 사용하면 횡단 관심사를 분리하여 관점 지향 프로그래밍을 적용한 코드를 작성할 수 있다.
+타입스크립트의 Decorator는 클래스, 메서드, 접근자, 프로퍼티, 매개변수에 적용 가능하다. 각 요소의 선언부 앞에 @로 시작하는 Decorator를 선언하면 구현된 코드가 함께 실행된다.</p>
+
+<h1 id="1-설정">1. 설정</h1>
+
+<p>Decorator를 사용하려면 tsconfig.json의 experimentalDecorators 옵션을 true로 활성화해야 한다.</p>
+
+<p>tsconfig.json</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+  <span class="dl">"</span><span class="s2">compilerOptions</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+    <span class="dl">"</span><span class="s2">target</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">ES5</span><span class="dl">"</span><span class="p">,</span>
+    <span class="dl">"</span><span class="s2">experimentalDecorators</span><span class="dl">"</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="2-사용-예시">2. 사용 예시</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">deco</span><span class="p">(</span>
+  <span class="nx">target</span><span class="p">:</span> <span class="nx">any</span><span class="p">,</span>
+  <span class="nx">propertyKey</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+  <span class="nx">descriptor</span><span class="p">:</span> <span class="nx">PropertyDescriptor</span>
+<span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Decorator 가 평가됨</span><span class="dl">"</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nx">TestClass</span> <span class="p">{</span>
+  <span class="p">@</span><span class="nd">deco</span>
+  <span class="nx">test</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">test 함수 호출</span><span class="dl">"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">t</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TestClass</span><span class="p">();</span>
+<span class="nx">t</span><span class="p">.</span><span class="nx">test</span><span class="p">();</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; Decorator 가 평가됨
+&gt; test 함수 호출
+</code></pre></div></div>
+
+<h1 id="3-decorator-factory">3. Decorator Factory</h1>
+
+<p>만약 <strong>Decorator 에 인수를 넘기고 싶다면</strong> Decorator Factory, 즉 <strong>Decorator를 리턴하는 함수를 만들면 된다.</strong></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">deco</span><span class="p">(</span><span class="nx">value</span><span class="p">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Decorator 평가됨</span><span class="dl">"</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span>
+    <span class="nx">target</span><span class="p">:</span> <span class="nx">any</span><span class="p">,</span>
+    <span class="nx">propertyKey</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">descriptor</span><span class="p">:</span> <span class="nx">PropertyDescriptor</span>
+  <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nx">TestClass</span> <span class="p">{</span>
+  <span class="p">@</span><span class="nd">deco</span><span class="p">(</span><span class="dl">"</span><span class="s2">Hello</span><span class="dl">"</span><span class="p">)</span>
+  <span class="nx">test</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">함수 호출됨</span><span class="dl">"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">t</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TestClass</span><span class="p">();</span>
+<span class="nx">t</span><span class="p">.</span><span class="nx">test</span><span class="p">();</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; Decorator 평가됨
+&gt; Hello
+&gt; 함수 호출됨
+</code></pre></div></div>
+
+<h1 id="4-decorator-합성">4. Decorator 합성</h1>
+
+<p>여러 개의 Decorator를 사용한다면 다음과 같이 선언한다.</p>
+
+<ul>
+  <li><strong>각 표현은 위에서 아래로 평가된다.</strong></li>
+  <li><strong>결과는 아래에서 위로 함수를 호출한다.</strong></li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">first</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">first(): factory evaluated</span><span class="dl">"</span><span class="p">);</span>
+  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span>
+    <span class="nx">target</span><span class="p">:</span> <span class="nx">any</span><span class="p">,</span>
+    <span class="nx">propertyKey</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">descriptor</span><span class="p">:</span> <span class="nx">PropertyDescriptor</span>
+  <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">first(): called</span><span class="dl">"</span><span class="p">);</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">second</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">second(): factory evaluated</span><span class="dl">"</span><span class="p">);</span>
+  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span>
+    <span class="nx">target</span><span class="p">:</span> <span class="nx">any</span><span class="p">,</span>
+    <span class="nx">propertyKey</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">descriptor</span><span class="p">:</span> <span class="nx">PropertyDescriptor</span>
+  <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">second(): called</span><span class="dl">"</span><span class="p">);</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nx">ExampleClass</span> <span class="p">{</span>
+  <span class="p">@</span><span class="nd">first</span><span class="p">()</span>
+  <span class="p">@</span><span class="nd">second</span><span class="p">()</span>
+  <span class="nx">method</span><span class="p">()</span> <span class="p">{}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; first(): factory evaluated
+&gt; second(): factory evaluated
+&gt; second(): called
+&gt; first(): called
+</code></pre></div></div>
+
+<h1 id="5-decorator-역할-요약">5. Decorator 역할 요약</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Decorator</th>
+      <th>역할</th>
+      <th>전달 인수</th>
+      <th>선언 불가능 위치</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Class Decorator</td>
+      <td>클래스의 정의를 읽거나 수정</td>
+      <td>constructor</td>
+      <td>d.ts 파일, declare 클래스</td>
+    </tr>
+    <tr>
+      <td>Method Decorator</td>
+      <td>메서드의 정의를 읽거나 수정</td>
+      <td>target, propertyKey, propertyDescriptor</td>
+      <td>d.ts 파일, declare 클래스, 오버로드 메서드</td>
+    </tr>
+    <tr>
+      <td>Accessor Decorator</td>
+      <td>접근자의 정의를 읽거나 수정</td>
+      <td>target, propertyKey, propertyDescriptor</td>
+      <td>d.ts 파일, declare 클래스</td>
+    </tr>
+    <tr>
+      <td>Property Decorator</td>
+      <td>속성의 정의를 읽거나 수정</td>
+      <td>target, propertyKey</td>
+      <td>d.ts 파일, declare 클래스</td>
+    </tr>
+    <tr>
+      <td>Parameter Decorator</td>
+      <td>매개변수의 정의를 읽음</td>
+      <td>target, propertyKey, parameterIndex</td>
+      <td>d.ts 파일, declare 클래스</td>
+    </tr>
+  </tbody>
+</table>
+
+      <br/>
+      <br/>
+    </div>
+    <script>
+
+    </script>
+  
+
+</article>
+
+  <hr class="dingbat" />
+
+  <div class="share">
+      <h2>Share this post</h2>
+      <div class="share-body">
+        <a href="http://twitter.com/share?text=Decorator&amp;url=http://localhost:4000/dev/2024/02/24/nest-decorator/"
+    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <span class="icon-twitter">
+            </span>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/02/24/nest-decorator/"
+    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="icon-facebook">
+            </span>
+        </a>
+    </div>
+  </div>
+  <br/>
+
+
+
+
+
+
+  <aside class="author" role="complementary">
+    <div class="author">
+  <h2 class="page-title hr">
+    About
+  </h2>
+<div class="author-body">
   
     
-    <h2 id="y2024" class="hr">2024</h2>
-    <ul class="related-posts">
+  
+
+  
+
+  <img
+    src="/assets/img/me.jpg"
+    class="me"
+    alt="gmin"
+    srcset="/assets/img/me.jpg 1x,/assets/img/me.jpg 2x"
     
-  
-  
+  />
 
 
-<li class="h4">
-  <a href="/dev/2024/02/24/nest-decorator/" data-flip="title">
-    <span>Decorator</span>
-  </a>
-  <small><time datetime="2024-02-24T00:00:00+09:00">
-    2024-02-24
-  </time></small>
-</li>
+  
+  <div class="author-body-description">
+    <p>기술을 통해 사람을 돕고 세상을 이롭게 하는 삶을 지향합니다.</p>
 
-  
+  </div>
+</div>
+</div>
 
-  
-  
-  
+  </aside>
+
+
+
+
+
+<aside class="related" role="complementary">
+  <h2 class="hr">Related Posts</h2>
+
+  <ul class="related-posts">
+    
+      
+      
+      
+        
+          
+          
+        
+        
+          
 
 
 <li class="h4">
@@ -234,7 +519,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
+        
+      
+    
   </ul>
+</aside>
 
 
 
@@ -283,7 +572,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
     <li>
       <input type="checkbox" id="list-item-1"/>
       <div  class="list-wrapper">
-      <a class="sidebar-nav-item active" href="/category/dev/">DEV</a>
+      <a class="sidebar-nav-item" href="/category/dev/">DEV</a>
        <label class="folder" for="list-item-1">▾</label>
     </div>
     <div>

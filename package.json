@@ -10,7 +10,8 @@
     "lint": "eslint _js/src",
     "dev": "npm run watch",
     "prepare": "npm run lint && npm run test && npm run clean && npm run build",
-    "resume": "json2yaml _data/resume.json > _data/resume.yml"
+    "resume": "json2yaml _data/resume.json > _data/resume.yml",
+    "start": "bundle exec jekyll serve"
   },
   "author": "Florian Klampfer <f.klampfer@gmail.com> (https://qwtel.com)",
   "license": "MIT",
