@@ -6,11 +6,16 @@ categories: dev
 tags: nestjs
 ---
 
-> - [1. 설정](#1-설정)
-> - [2. 사용 예시](#2-사용-예시)
-> - [3. Decorator Factory](#3-decorator-factory)
-> - [4. Decorator 합성](#4-decorator-합성)
-> - [5. Decorator 역할 요약](#5-decorator-역할-요약)
+> - [1. 컨트롤러](#1-컨트롤러)
+>   - [1.1 라우팅](#11-라우팅)
+>   - [1.2 요청 객체](#12-요청-객체)
+>   - [1.3 응답](#13-응답)
+>   - [1.4 헤더](#14-헤더)
+>   - [1.5 리디렉션](#15-리디렉션)
+>   - [1.6 라우트 매개변수](#16-라우트-매개변수)
+>   - [1.7 하위 도메인 라우팅](#17-하위-도메인-라우팅)
+>   - [1.9 페이로드 다루기](#19-페이로드-다루기)
+> - [2. 유저 서비스의 인터페이스](#2-유저-서비스의-인터페이스)
 
 ---
 
@@ -146,3 +151,9 @@ class ExampleClass {
 | Accessor Decorator  | 접근자의 정의를 읽거나 수정 | target, propertyKey, propertyDescriptor | d.ts 파일, declare 클래스                  |
 | Property Decorator  | 속성의 정의를 읽거나 수정   | target, propertyKey                     | d.ts 파일, declare 클래스                  |
 | Parameter Decorator | 매개변수의 정의를 읽음      | target, propertyKey, parameterIndex     | d.ts 파일, declare 클래스                  |
+
+---
+
+_본 포스트는 한용재 저자의 **NestJS로 배우는 백엔드 프로그래밍**을 기반으로 스터디하며 정리한 내용들입니다._
+
+- [NestJS로 배우는 백엔드 프로그래밍](http://www.yes24.com/Product/Goods/115850682)
