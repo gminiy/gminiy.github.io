@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Decorator"
-date: 2024-02-24
+date: 2024-02-23
 categories: dev
 tags: nestjs
 ---
