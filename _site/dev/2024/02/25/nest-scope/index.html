@@ -35,7 +35,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="format-detection" content="telephone=no">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
-<meta property="og:title" content="DEV">
+<meta property="og:title" content="[NestJs] 스코프">
 <meta property="og:type" content="article">
 
 
@@ -49,13 +49,29 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 
 
 
-  <title>DEV &middot; Gmin.Y Blog</title>
+  <title>[NestJs] 스코프 &middot; Gmin.Y Blog</title>
 
 
 
-<meta name="description" content="개발에 관련된 내용 공유
+<meta name="description" content="
+  1. 스코프
+    
+      1.1 프로바이더에 스코프 적용
+      1.2 컨트롤러에 스코프 적용
+    
+  
+
+
 ">
-<meta property="og:description" content="개발에 관련된 내용 공유
+<meta property="og:description" content="
+  1. 스코프
+    
+      1.1 프로바이더에 스코프 적용
+      1.2 컨트롤러에 스코프 적용
+    
+  
+
+
 ">
 
 
@@ -67,8 +83,8 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <!-- =============== -->
 <!-- LINKS           -->
 <!-- =============== -->
-<link rel="canonical" href="http://localhost:4000/category/dev/">
-<meta property="og:url" content="http://localhost:4000/category/dev/">
+<link rel="canonical" href="http://localhost:4000/dev/2024/02/25/nest-scope/">
+<meta property="og:url" content="http://localhost:4000/dev/2024/02/25/nest-scope/">
 <meta name="google-site-verification" content="g4I-a_du23AFdfLFV2vuKYLo_phz8igXQAF3pHc57wA" />
 
 <!-- Google tag (gtag.js) -->
@@ -83,6 +99,8 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 
 <link rel="alternate" type="application/atom+xml" title="Gmin.Y Blog Feed" href="http://localhost:4000/feed.xml">
 
+
+  <link rel="prev" href="http://localhost:4000/dev/2024/02/25/nest-provider/">
 
 
 
@@ -176,53 +194,213 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   <div class="fade-in">
     <main id="_main" class="content" role="main" data-color="#4f86aa" data-image="/assets/img/main-left.jpeg">
       <!--<div style="text-align: center;">&lt;!&ndash; 조회수 노출 HITS &ndash;&gt;
-        <a href="http://hits.dwyl.com/localhost:4000/category/dev/"
+        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/02/25/nest-scope/"
            target="_blank">
-          <img src="http://hits.dwyl.com/localhost:4000/category/dev/.svg" /></a>
+          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/02/25/nest-scope/.svg" /></a>
       </div>-->
+      
+
+<article id="post-dev/2024/02/25/nest-scope" class="post" role="article">
+  <header>
+    <h1 class="post-title">
+      
+        [NestJs] 스코프
+      
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-02-25T00:00:00+09:00">2024-02-25</time>
       
 
 
 
-  <header>
-    <h1 class="page-title">DEV</h1>
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
     
-  
-  
-<p class="message">개발에 관련된 내용 공유</p>
-
-
+  <div class="hr" style="padding-bottom:0"></div>
 
 
   </header>
-  <hr class="sr-only"/>
-
-
+  
 
   
+    <div class="markdown-body">
+
+
+<br/>
+      <ul>
+  <li><a href="#1-스코프">1. 스코프</a>
+    <ul>
+      <li><a href="#11-프로바이더에-스코프-적용">1.1 프로바이더에 스코프 적용</a></li>
+      <li><a href="#12-컨트롤러에-스코프-적용">1.2 컨트롤러에 스코프 적용</a></li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h1 id="1-스코프">1. 스코프</h1>
+
+<p>Node.JS는 멀티 스레드 상태 비저장 모델을 따르지 않기 때문에 싱글턴 인스턴스를 사용하는 것이 권장된다.
+하지만 요청별로 캐싱을 한다거나 요청 추적, 또는 멀티테넌시를 지원하기 위해서는 요청 기반으로 생명주기를 제한해야 한다.</p>
+
+<p>아래는 스코프 종류이다.</p>
+
+<ul>
+  <li>
+    <p>Default
+싱글턴 인스턴스가 전체 애플리케이션에 공유됨
+인스턴스 수명은 애플리케이션 생명주기와 같다.
+애플리케이션이 부팅되면 모든 싱글턴 프로바이더의 인스턴스가 만들어진다.</p>
+  </li>
+  <li>
+    <p>Request
+들어오는 요청마다 별도의 인스턴스가 생성됨
+요청을 처리하고 나면 인스턴스는 garbage-collected 됨</p>
+  </li>
+  <li>
+    <p>Transient
+인스턴스는 공유되지 않는다.
+이 프로바이더를 주입하는 각 컴포넌트는 새로 생성된 전용 인스턴스를 주입받는다.</p>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="11-프로바이더에-스코프-적용">1.1 프로바이더에 스코프 적용</h2>
+
+<p>@Injectable 데코레이터에 scope속성을 주는 방법</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Injectable</span><span class="p">,</span> <span class="nx">Scope</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Injectable</span><span class="p">({</span> <span class="na">scope</span><span class="p">:</span> <span class="nx">Scope</span><span class="p">.</span><span class="nx">REQUEST</span> <span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CatsService</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="12-컨트롤러에-스코프-적용">1.2 컨트롤러에 스코프 적용</h2>
+
+<p>@Controller 데코레이터는 ControllerOptions를 인수로 받을 수 있다. ContorllerOptions는 ScopeOptions를 상속한다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Constroller</span><span class="p">({</span>
+  <span class="na">path</span><span class="p">:</span> <span class="dl">"</span><span class="s2">cats</span><span class="dl">"</span><span class="p">,</span>
+  <span class="na">scope</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Scope.REQUEST</span><span class="dl">"</span><span class="p">,</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CatsController</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<hr />
+
+<p><em>본 포스트는 한용재 저자의 <strong>NestJS로 배우는 백엔드 프로그래밍</strong>을 기반으로 스터디하며 정리한 내용들입니다.</em></p>
+
+<ul>
+  <li><a href="http://www.yes24.com/Product/Goods/115850682">NestJS로 배우는 백엔드 프로그래밍</a></li>
+</ul>
+
+      <br/>
+      <br/>
+    </div>
+    <script>
+
+    </script>
+  
+
+</article>
+
+  <hr class="dingbat" />
+
+  <div class="share">
+      <h2>Share this post</h2>
+      <div class="share-body">
+        <a href="http://twitter.com/share?text=[NestJs] 스코프&amp;url=http://localhost:4000/dev/2024/02/25/nest-scope/"
+    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <span class="icon-twitter">
+            </span>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/02/25/nest-scope/"
+    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="icon-facebook">
+            </span>
+        </a>
+    </div>
+  </div>
+  <br/>
+
+
+
+
+
+
+  <aside class="author" role="complementary">
+    <div class="author">
+  <h2 class="page-title hr">
+    About
+  </h2>
+<div class="author-body">
   
     
-    <h2 id="y2024" class="hr">2024</h2>
-    <ul class="related-posts">
+  
+
+  
+
+  <img
+    src="/assets/img/me.jpg"
+    class="me"
+    alt="gmin"
+    srcset="/assets/img/me.jpg 1x,/assets/img/me.jpg 2x"
     
-  
-  
+  />
 
 
-<li class="h4">
-  <a href="/dev/2024/02/25/nest-scope/" data-flip="title">
-    <span>[NestJs] 스코프</span>
-  </a>
-  <small><time datetime="2024-02-25T00:00:00+09:00">
-    2024-02-25
-  </time></small>
-</li>
+  
+  <div class="author-body-description">
+    <p>기술을 통해 사람을 돕고 세상을 이롭게 하는 삶을 지향합니다.</p>
 
-  
+  </div>
+</div>
+</div>
 
-  
-  
-  
+  </aside>
+
+
+
+
+
+<aside class="related" role="complementary">
+  <h2 class="hr">Related Posts</h2>
+
+  <ul class="related-posts">
+    
+      
+      
+      
+        
+          
+          
+        
+        
+          
 
 
 <li class="h4">
@@ -234,11 +412,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
-  
-
-  
-  
-  
+        
+      
+        
+        
+          
 
 
 <li class="h4">
@@ -250,11 +428,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
-  
-
-  
-  
-  
+        
+      
+        
+        
+          
 
 
 <li class="h4">
@@ -266,23 +444,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/23/nest-basic/" data-flip="title">
-    <span>[NestJs] NestJs 장점 및 설치</span>
-  </a>
-  <small><time datetime="2024-02-23T00:00:00+09:00">
-    2024-02-23
-  </time></small>
-</li>
-
+        
+      
+    
   </ul>
+</aside>
 
 
 
@@ -331,7 +497,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
     <li>
       <input type="checkbox" id="list-item-1"/>
       <div  class="list-wrapper">
-      <a class="sidebar-nav-item active" href="/category/dev/">DEV</a>
+      <a class="sidebar-nav-item" href="/category/dev/">DEV</a>
        <label class="folder" for="list-item-1">▾</label>
     </div>
     <div>
