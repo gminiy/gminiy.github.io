@@ -27,7 +27,7 @@ tags: nestjs
 
 Nest에서 제공하는 프로바이더는 따로 라이브러리를 사용하지 않고 의존성을 주입할 수 있다.
 
-- user.controller.ts
+- users.controller.ts
 
 ```javascript
 @Controller('users')
@@ -42,6 +42,8 @@ export class UsersController {
 ```
 
 컨트롤러는 비즈니스 로직을 직접 수행하지 않는다. UsersController가 UsersService를 생성자를 통해 주입 받아서 멤버 변수에 할당해서 사용한다. 이때 UsersService에는 @Injectable 데코레이터를 선언해서 다른 어떤 Nest 컴포넌트에서도 주입할 수 있는 프로바이더가 된다. 별도의 스코프를 지정해주지 않으면 싱글턴 인스턴스가 된다.
+
+- users.service.ts
 
 ```javascript
 import { Injectable } from "@nestjs/common";
@@ -205,7 +207,7 @@ export class UsersService {
 
 ## 2.4 회원 가입 이메일 발송
 
-여기서는 무료 이메일 전송 라이브러리인 nnodemailer를 사용한다.
+여기서는 무료 이메일 전송 라이브러리인 nodemailer를 사용한다.
 
 ```shell
 $ npm i nodemailer
