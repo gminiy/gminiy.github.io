@@ -302,7 +302,7 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 <p>Nest에서 제공하는 프로바이더는 따로 라이브러리를 사용하지 않고 의존성을 주입할 수 있다.</p>
 
 <ul>
-  <li>user.controller.ts</li>
+  <li>users.controller.ts</li>
 </ul>
 
 <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Controller</span><span class="p">(</span><span class="dl">'</span><span class="s1">users</span><span class="dl">'</span><span class="p">)</span>
@@ -317,6 +317,10 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 </code></pre></div></div>
 
 <p>컨트롤러는 비즈니스 로직을 직접 수행하지 않는다. UsersController가 UsersService를 생성자를 통해 주입 받아서 멤버 변수에 할당해서 사용한다. 이때 UsersService에는 @Injectable 데코레이터를 선언해서 다른 어떤 Nest 컴포넌트에서도 주입할 수 있는 프로바이더가 된다. 별도의 스코프를 지정해주지 않으면 싱글턴 인스턴스가 된다.</p>
+
+<ul>
+  <li>users.service.ts</li>
+</ul>
 
 <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Injectable</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
 
@@ -481,7 +485,7 @@ uuid 라이브러리를 설치한다.</p>
 
 <h2 id="24-회원-가입-이메일-발송">2.4 회원 가입 이메일 발송</h2>
 
-<p>여기서는 무료 이메일 전송 라이브러리인 nnodemailer를 사용한다.</p>
+<p>여기서는 무료 이메일 전송 라이브러리인 nodemailer를 사용한다.</p>
 
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm i nodemailer
 <span class="nv">$ </span>npm i <span class="nt">-D</span> @types/nodemailer
@@ -748,6 +752,38 @@ UserService에서 EmailService를 주입 받아서 sendMemverJoinEmail에서 ema
 
 
 <li class="h4">
+  <a href="/dev/2024/02/28/nest-dynamic-module-env-config/" data-flip="title">
+    <span>[NestJs] 동적 모듈을 활용한 환경 변수 구성</span>
+  </a>
+  <small><time datetime="2024-02-28T00:00:00+09:00">
+    2024-02-28
+  </time></small>
+</li>
+
+        
+      
+        
+        
+          
+
+
+<li class="h4">
+  <a href="/dev/2024/02/27/nest-module/" data-flip="title">
+    <span>[NestJs] 모듈 설계</span>
+  </a>
+  <small><time datetime="2024-02-27T00:00:00+09:00">
+    2024-02-27
+  </time></small>
+</li>
+
+        
+      
+        
+        
+          
+
+
+<li class="h4">
   <a href="/dev/2024/02/25/nest-scope/" data-flip="title">
     <span>[NestJs] 스코프</span>
   </a>
@@ -761,38 +797,6 @@ UserService에서 EmailService를 주입 받아서 sendMemverJoinEmail에서 ema
         
           
           
-        
-        
-          
-
-
-<li class="h4">
-  <a href="/dev/2024/02/24/nest-interface/" data-flip="title">
-    <span>[NestJs] 인터페이스</span>
-  </a>
-  <small><time datetime="2024-02-24T00:00:00+09:00">
-    2024-02-24
-  </time></small>
-</li>
-
-        
-      
-        
-        
-          
-
-
-<li class="h4">
-  <a href="/dev/2024/02/23/nest-decorator/" data-flip="title">
-    <span>[NestJs] Decorator</span>
-  </a>
-  <small><time datetime="2024-02-23T00:00:00+09:00">
-    2024-02-23
-  </time></small>
-</li>
-
-        
-      
     
   </ul>
 </aside>
