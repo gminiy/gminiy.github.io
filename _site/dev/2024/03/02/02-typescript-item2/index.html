@@ -35,7 +35,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="format-detection" content="telephone=no">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
-<meta property="og:title" content="NestJs">
+<meta property="og:title" content="[TypeScript] 타입스크립트 설정">
 <meta property="og:type" content="article">
 
 
@@ -49,13 +49,19 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 
 
 
-  <title>NestJs &middot; Gmin.Y Blog</title>
+  <title>[TypeScript] 타입스크립트 설정 &middot; Gmin.Y Blog</title>
 
 
 
 <meta name="description" content="
+  tsconfig.json을 통해 타입스크립트 옵션을 설정해야 동료들과 다른 도구들이 알 수 있다.
+
+
 ">
 <meta property="og:description" content="
+  tsconfig.json을 통해 타입스크립트 옵션을 설정해야 동료들과 다른 도구들이 알 수 있다.
+
+
 ">
 
 
@@ -67,8 +73,8 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <!-- =============== -->
 <!-- LINKS           -->
 <!-- =============== -->
-<link rel="canonical" href="http://localhost:4000/tag/dev-nestjs/">
-<meta property="og:url" content="http://localhost:4000/tag/dev-nestjs/">
+<link rel="canonical" href="http://localhost:4000/dev/2024/03/02/02-typescript-item2/">
+<meta property="og:url" content="http://localhost:4000/dev/2024/03/02/02-typescript-item2/">
 <meta name="google-site-verification" content="g4I-a_du23AFdfLFV2vuKYLo_phz8igXQAF3pHc57wA" />
 
 <!-- Google tag (gtag.js) -->
@@ -84,9 +90,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <link rel="alternate" type="application/atom+xml" title="Gmin.Y Blog Feed" href="http://localhost:4000/feed.xml">
 
 
+  <link rel="prev" href="http://localhost:4000/dev/2024/03/02/01-typescript-item1/">
 
 
-  <link rel="next" href="http://localhost:4000/tag/dev-typescript/">
+
+  <link rel="next" href="http://localhost:4000/dev/2024/03/02/08-nest-pipe-validation-check/">
 
 
 <link rel="apple-touch-icon" href="http://localhost:4000/apple-touch-icon.png">
@@ -178,33 +186,201 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   <div class="fade-in">
     <main id="_main" class="content" role="main" data-color="#4f86aa" data-image="/assets/img/main-left.jpeg">
       <!--<div style="text-align: center;">&lt;!&ndash; 조회수 노출 HITS &ndash;&gt;
-        <a href="http://hits.dwyl.com/localhost:4000/tag/dev-nestjs/"
+        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/03/02/02-typescript-item2/"
            target="_blank">
-          <img src="http://hits.dwyl.com/localhost:4000/tag/dev-nestjs/.svg" /></a>
+          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/03/02/02-typescript-item2/.svg" /></a>
       </div>-->
+      
+
+<article id="post-dev/2024/03/02/02-typescript-item2" class="post" role="article">
+  <header>
+    <h1 class="post-title">
+      
+        [TypeScript] 타입스크립트 설정
+      
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-02T00:00:00+09:00">2024-03-02</time>
       
 
 
 
-  <header>
-    <h1 class="page-title">NestJs</h1>
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-typescript/" data-flip="title">TypeScript</a>
+
+    </p>
+
     
   <div class="hr" style="padding-bottom:0"></div>
 
 
   </header>
-  <hr class="sr-only"/>
-
-
+  
 
   
+    <div class="markdown-body">
+
+
+<br/>
+      <ul>
+  <li>tsconfig.json을 통해 타입스크립트 옵션을 설정해야 동료들과 다른 도구들이 알 수 있다.</li>
+</ul>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"compilerOptions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"module"</span><span class="p">:</span><span class="w"> </span><span class="s2">"commonjs"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"declaration"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"removeComments"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"emitDecoratorMetadata"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"experimentalDecorators"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"allowSyntheticDefaultImports"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"target"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ES2021"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"sourceMap"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"outDir"</span><span class="p">:</span><span class="w"> </span><span class="s2">"./dist"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"baseUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"./"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"incremental"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"skipLibCheck"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"strictNullChecks"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"noImplicitAny"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"strictBindCallApply"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"forceConsistentCasingInFileNames"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"noFallthroughCasesInSwitch"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"src/**/*"</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<ul>
+  <li><strong>noImplicitAny</strong>는 변수들이 미리 정의된 타입을 가져야 하는지 여부를 제어한다. <strong>되도록이면 true</strong>로 설정해서 ‘implicit any’를 제거한다.</li>
+  <li><strong>strictNullChecks</strong>는 null과 undefined가 모든 타입에서 허용되는 지 확인한다.
+    <ul>
+      <li>const x: number = null 은 strictNullChecks가 true면 오류가 발생한다.
+        <ul>
+          <li>
+            <table>
+              <tbody>
+                <tr>
+                  <td>const x: number</td>
+                  <td>null = null 의도를 명시적으로 드러냄으로써 오류를 해결한다.</td>
+                </tr>
+              </tbody>
+            </table>
+          </li>
+          <li>null과 undefined 관련된 오류를 잡아 내는 데 도움이 되지만 코드 작성이 어렵다. 익숙한 사용자는 true를 사용하는 것이 좋지만 false로 설정해도 괜찮다.</li>
+          <li>strictNullChecks 는 noImplictAny가 true이어야 한다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>타입스크립트에서 엄격한 체크를 하고 싶다면 strict 설정을 고려해보아야 한다.</li>
+</ul>
+
+<hr />
+
+<p><em>본 포스트는 댄 밴더캄 저자의 <strong>이펙티브 타입스크립트</strong>를 기반으로 스터디하며 정리한 내용들입니다.</em></p>
+
+<ul>
+  <li><a href="https://product.kyobobook.co.kr/detail/S000001033114">이펙티브 타입스크립트</a></li>
+</ul>
+
+      <br/>
+      <br/>
+    </div>
+    <script>
+
+    </script>
+  
+
+</article>
+
+  <hr class="dingbat" />
+
+  <div class="share">
+      <h2>Share this post</h2>
+      <div class="share-body">
+        <a href="http://twitter.com/share?text=[TypeScript] 타입스크립트 설정&amp;url=http://localhost:4000/dev/2024/03/02/02-typescript-item2/"
+    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <span class="icon-twitter">
+            </span>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/03/02/02-typescript-item2/"
+    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="icon-facebook">
+            </span>
+        </a>
+    </div>
+  </div>
+  <br/>
+
+
+
+
+
+
+  <aside class="author" role="complementary">
+    <div class="author">
+  <h2 class="page-title hr">
+    About
+  </h2>
+<div class="author-body">
   
     
-    <h2 id="y2024" class="hr">2024</h2>
-    <ul class="related-posts">
+  
+
+  
+
+  <img
+    src="/assets/img/me.jpg"
+    class="me"
+    alt="gmin"
+    srcset="/assets/img/me.jpg 1x,/assets/img/me.jpg 2x"
     
+  />
+
+
   
-  
+  <div class="author-body-description">
+    <p>기술을 통해 사람을 돕고 세상을 이롭게 하는 삶을 지향합니다.</p>
+
+  </div>
+</div>
+</div>
+
+  </aside>
+
+
+
+
+
+<aside class="related" role="complementary">
+  <h2 class="hr">Related Posts</h2>
+
+  <ul class="related-posts">
+    
+      
+      
+      
+        
+        
+          
 
 
 <li class="h4">
@@ -216,11 +392,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
-  
-
-  
-  
-  
+        
+      
+        
+        
+          
 
 
 <li class="h4">
@@ -232,11 +408,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
-  
-
-  
-  
-  
+        
+      
+        
+        
+          
 
 
 <li class="h4">
@@ -248,247 +424,14 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/03/15-nest-health-check/" data-flip="title">
-    <span>[NestJs] 헬스 체크</span>
-  </a>
-  <small><time datetime="2024-03-03T00:00:00+09:00">
-    2024-03-03
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/03/14-nest-interceptor/" data-flip="title">
-    <span>[NestJs] 인터셉터</span>
-  </a>
-  <small><time datetime="2024-03-03T00:00:00+09:00">
-    2024-03-03
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/03/13-nest-exception/" data-flip="title">
-    <span>[NestJs] 예외 처리</span>
-  </a>
-  <small><time datetime="2024-03-03T00:00:00+09:00">
-    2024-03-03
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/03/12-nest-logger-copy/" data-flip="title">
-    <span>[NestJs] 로깅</span>
-  </a>
-  <small><time datetime="2024-03-03T00:00:00+09:00">
-    2024-03-03
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/02/11-nest-guard/" data-flip="title">
-    <span>[NestJs] 권한 확인을 위한 가드</span>
-  </a>
-  <small><time datetime="2024-03-02T00:00:00+09:00">
-    2024-03-02
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/02/10-nest-middleware/" data-flip="title">
-    <span>[NestJs] 미들웨어</span>
-  </a>
-  <small><time datetime="2024-03-02T00:00:00+09:00">
-    2024-03-02
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/02/09-nest-database/" data-flip="title">
-    <span>[NestJs] 영속화 - 데이터베이스 다루기</span>
-  </a>
-  <small><time datetime="2024-03-02T00:00:00+09:00">
-    2024-03-02
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/02/08-nest-pipe-validation-check/" data-flip="title">
-    <span>[NestJs] 파이프와 유효성 검사</span>
-  </a>
-  <small><time datetime="2024-03-02T00:00:00+09:00">
-    2024-03-02
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/28/07-nest-dynamic-module-env-config/" data-flip="title">
-    <span>[NestJs] 동적 모듈을 활용한 환경 변수 구성</span>
-  </a>
-  <small><time datetime="2024-02-28T00:00:00+09:00">
-    2024-02-28
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/27/06-nest-module/" data-flip="title">
-    <span>[NestJs] 모듈 설계</span>
-  </a>
-  <small><time datetime="2024-02-27T00:00:00+09:00">
-    2024-02-27
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/25/05-nest-scope/" data-flip="title">
-    <span>[NestJs] 스코프</span>
-  </a>
-  <small><time datetime="2024-02-25T00:00:00+09:00">
-    2024-02-25
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/25/04-nest-provider/" data-flip="title">
-    <span>[NestJs] 프로바이더</span>
-  </a>
-  <small><time datetime="2024-02-25T00:00:00+09:00">
-    2024-02-25
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/24/03-nest-interface/" data-flip="title">
-    <span>[NestJs] 인터페이스</span>
-  </a>
-  <small><time datetime="2024-02-24T00:00:00+09:00">
-    2024-02-24
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/23/02-nest-decorator/" data-flip="title">
-    <span>[NestJs] Decorator</span>
-  </a>
-  <small><time datetime="2024-02-23T00:00:00+09:00">
-    2024-02-23
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/23/01-nest-basic/" data-flip="title">
-    <span>[NestJs] NestJs 장점 및 설치</span>
-  </a>
-  <small><time datetime="2024-02-23T00:00:00+09:00">
-    2024-02-23
-  </time></small>
-</li>
-
+        
+      
+        
+        
+      
+    
   </ul>
+</aside>
 
 
 
@@ -545,7 +488,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
        
            
              <li>
-               <a class="sidebar-nav-subitem active" href="/tag/dev-nestjs/">NestJs</a>
+               <a class="sidebar-nav-subitem" href="/tag/dev-nestjs/">NestJs</a>
              </li>
            
          

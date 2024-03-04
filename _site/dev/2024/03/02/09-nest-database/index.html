@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="/assets/lib/jquery-1.12.0.min.js"></script>
+<script src="/assets/lib/jquery.magnific-popup.min.js"></script>
+<script src="/assets/js/index.js"></script>
+<!--
+ __  __                __                                     __
+/\ \/\ \              /\ \             __                    /\ \
+\ \ \_\ \   __  __    \_\ \      __   /\_\      __       ___ \ \ \/'\
+ \ \  _  \ /\ \/\ \   /'_` \   /'__`\ \/\ \   /'__`\    /'___\\ \ , <
+  \ \ \ \ \\ \ \_\ \ /\ \L\ \ /\  __/  \ \ \ /\ \L\.\_ /\ \__/ \ \ \\`\
+   \ \_\ \_\\/`____ \\ \___,_\\ \____\ _\ \ \\ \__/.\_\\ \____\ \ \_\ \_\
+    \/_/\/_/ `/___/> \\/__,_ / \/____//\ \_\ \\/__/\/_/ \/____/  \/_/\/_/
+                /\___/                \ \____/
+                \/__/                  \/___/
+
+Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
+-->
+
+
+
+
+
+
+
+
+
+<head>
+  <script data-ad-client="ca-pub-6794902480931711" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><!-- 구글 애드센스.. -->
+  <meta name="naver-site-verification" content="5ed99748eeae22ae60b755d080de65ec0e50cc40" />
+  <!-- =============== -->
+<!-- META            -->
+<!-- =============== -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="format-detection" content="telephone=no">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta property="og:title" content="[NestJs] 영속화 - 데이터베이스 다루기">
+<meta property="og:type" content="article">
+
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/img/logo.png">
+
+
+<meta property="og:image:width" content="640" />
+<meta property="og:image:height" content="360" />
+
+
+
+  <title>[NestJs] 영속화 - 데이터베이스 다루기 &middot; Gmin.Y Blog</title>
+
+
+
+<meta name="description" content="
+  1. MySQL 설정
+  2. TypeORM으로 데이터베이스 연결
+  3. 회원 가입 요청한 유저의 정보 저장
+  4. 트랜잭션 적용
+    
+      4.1 QueryRunner 사용
+      4.2 transaction 함수 이용
+    
+  
+  5. 마이그레이션
+
+
+">
+<meta property="og:description" content="
+  1. MySQL 설정
+  2. TypeORM으로 데이터베이스 연결
+  3. 회원 가입 요청한 유저의 정보 저장
+  4. 트랜잭션 적용
+    
+      4.1 QueryRunner 사용
+      4.2 transaction 함수 이용
+    
+  
+  5. 마이그레이션
+
+
+">
+
+
+
+<!-- tipuesearch -->
+<link rel="stylesheet" href="/assets/tipuesearch/css/tipuesearch.css">
+
+
+<!-- =============== -->
+<!-- LINKS           -->
+<!-- =============== -->
+<link rel="canonical" href="http://localhost:4000/dev/2024/03/02/09-nest-database/">
+<meta property="og:url" content="http://localhost:4000/dev/2024/03/02/09-nest-database/">
+<meta name="google-site-verification" content="g4I-a_du23AFdfLFV2vuKYLo_phz8igXQAF3pHc57wA" />
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N0KPWLFWQ2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-N0KPWLFWQ2');
+</script>
+
+<link rel="alternate" type="application/atom+xml" title="Gmin.Y Blog Feed" href="http://localhost:4000/feed.xml">
+
+
+  <link rel="prev" href="http://localhost:4000/dev/2024/03/02/08-nest-pipe-validation-check/">
+
+
+
+  <link rel="next" href="http://localhost:4000/dev/2024/03/02/10-nest-middleware/">
+
+
+<link rel="apple-touch-icon" href="http://localhost:4000/apple-touch-icon.png">
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?">
+<!-- Place favicon.ico in the root directory -->
+
+<!-- =============== -->
+<!-- SCRIPTS         -->
+<!-- =============== -->
+
+<script>
+  !function(n,e){function t(n,e){n.onload=function(){this.onerror=this.onload=null,e(null,n)},n.onerror=function(){this.onerror=this.onload=null,e(new Error("Failed to load "+this.src),n)}}function o(n,e){n.onreadystatechange=function(){"complete"!=this.readyState&&"loaded"!=this.readyState||(this.onreadystatechange=null,e(null,n))}}n._loaded=!1,n.loadJSDeferred=function(a,d){function r(){n._loaded=!0;var r=e.createElement("script");r.src=a,d&&(("onload"in r?t:o)(r,d),r.onload||t(r,d));var l=e.getElementsByTagName("script")[0];l.parentNode.insertBefore(r,l)}n._loaded?r():n.addEventListener?n.addEventListener("load",r,!1):n.attachEvent?n.attachEvent("onload",r):n.onload=r}}(window,document);
+
+  !function(e){"use strict";var n=function(n,t,o){function i(e){if(a.body)return e();setTimeout(function(){i(e)})}function r(){l.addEventListener&&l.removeEventListener("load",r),l.media=o||"all"}var d,a=e.document,l=a.createElement("link");if(t)d=t;else{var f=(a.body||a.getElementsByTagName("head")[0]).childNodes;d=f[f.length-1]}var s=a.styleSheets;l.rel="stylesheet",l.href=n,l.media="only x",i(function(){d.parentNode.insertBefore(l,t?d:d.nextSibling)});var u=function(e){for(var n=l.href,t=s.length;t--;)if(s[t].href===n)return e();setTimeout(function(){u(e)})};return l.addEventListener&&l.addEventListener("load",r),l.onloadcssdefined=u,u(r),l};"undefined"!=typeof exports?exports.loadCSS=n:e.loadCSS=n}("undefined"!=typeof global?global:this);
+
+  !function(t){if(t.loadCSS){var e=loadCSS.relpreload={};if(e.support=function(){try{return t.document.createElement("link").relList.supports("preload")}catch(t){return!1}},e.poly=function(){for(var e=t.document.getElementsByTagName("link"),r=0;r<e.length;r++){var n=e[r];"preload"===n.rel&&"style"===n.getAttribute("as")&&(t.loadCSS(n.href,n,n.getAttribute("media")),n.rel=null)}},!e.support()){e.poly();var r=t.setInterval(e.poly,300);t.addEventListener&&t.addEventListener("load",function(){e.poly(),t.clearInterval(r)}),t.attachEvent&&t.attachEvent("onload",function(){t.clearInterval(r)})}}}(this);
+
+  window.disablePushState = false;
+  window.disableDrawer = false;
+</script>
+
+<!--[if lt IE 9]>
+<script src="https://unpkg.com/html5shiv/dist/html5shiv.min.js"></script>
+<![endif]-->
+
+<!-- =============== -->
+<!-- STYLES          -->
+<!-- =============== -->
+<style>
+  
+  @import url(https://fonts.googleapis.com/earlyaccess/nanumgothic.css);article,aside,dialog,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}mark{background:#FF0;color:#000}*{box-sizing:border-box}html,body{margin:0;padding:0}html{font-size:16px;line-height:1.75}body{color:#333;background-color:#fff;overflow-y:scroll}a{text-decoration:none}.lead{margin-left:-1rem;margin-right:-1rem}img,.img{display:block;max-width:100%;margin-bottom:1rem;border:none}img.lead,.img.lead{max-width:calc(100% + 2rem);width:calc(100% + 2rem)}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6,.heading{font-weight:bold;text-rendering:optimizeLegibility}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6{margin:1.6rem 0 1rem;line-height:1.6}h1,.h1{font-size:2rem;line-height:1.25}h2,.h2{font-size:1.5rem}h3,.h3{font-size:1.17em}p{margin-top:0;margin-bottom:1rem}p.lead{font-size:1.25rem;font-weight:300;padding:0 1rem}ul,ol,dl{margin-top:0;margin-bottom:1rem}ul,ol{padding-left:1.25rem}hr{position:relative;margin:2rem 0 3rem 0;border:0;border-top:1px solid #eee}.hr{padding-bottom:.5rem;border-bottom:1px solid #eee;margin-bottom:1.5rem}h4,h5,h6,.h4,.h5,.h6{margin-bottom:0.5rem;font-size:1rem}table{margin-bottom:1rem;width:100%;width:calc(100% + 2rem);margin-left:-1rem;border:1px solid #e5e5e5;border-collapse:collapse;border-spacing:0}td,th{padding:.25rem .5rem;border:1px solid #e5e5e5}td:first-child,th:first-child{padding-left:1rem}td:last-child,th:last-child{padding-right:1rem}thead+tbody,tbody+tbody,tfoot{border-top:3px double #e5e5e5}tbody tr:nth-child(odd) td,tbody tr:nth-child(odd) th{background-color:#f9f9f9}footer{margin-bottom:2rem}.page,.post{margin-bottom:3em}.page li+li,.post li+li{margin-top:.25rem}.page>header,.post>header{margin-bottom:2rem}.page-title,.post-title{margin-top:0}.post-date{display:block;margin-top:-0.5rem;margin-bottom:1rem;color:#9a9a9a}.related-posts{padding-left:0;list-style:none}.related-posts>li,.related-posts>li+li{margin-top:1rem}.related-posts>li>small,.related-posts>li+li>small{font-size:75%;color:#9a9a9a}.message{margin-bottom:1rem;padding:1rem;color:#787878;background-color:#f9f9f9;margin-left:-1rem;margin-right:-1rem}body,main{position:relative;overflow-x:hidden}@media screen{body::before{content:'';background:#e5e5e5;position:absolute;left:0;top:0;bottom:0}}@media screen and (min-width: 40em){html{font-size:17px}}@media screen and (min-width: 54em){html{font-size:16px}}@media screen and (min-width: 88em){html{font-size:15px}}@media screen and (min-width: 125em){html{font-size:18px}}.sr-only{display:none}.clearfix,.sidebar-social::after,.clearafter::after{content:"";display:table;clear:both}a,.a{position:relative;padding-bottom:.15rem;border-style:hidden}.img{overflow:hidden;background-color:#f9f9f9}.img>img{margin:0;width:100%;height:100%}.sixteen-nine{position:relative}.sixteen-nine::before{display:block;content:"";width:100%;padding-top:56.25%}.sixteen-nine>*{position:absolute;top:0;left:0;right:0;bottom:0}h1+hr,h2+hr,h3+hr,h4+hr,h5+hr,h6+hr{margin-top:0}.fade-in{animation-duration:500ms;animation-name:fade-in;animation-fill-mode:forwards}@keyframes fade-in{from{transform:translateY(-2rem);opacity:0}50%{transform:translateY(-2rem);opacity:0}to{transform:translateY(0);opacity:1}}.mb6{margin-bottom:10rem}.sidebar{color:rgba(255,255,255,0.75);text-align:left}.sidebar::before{content:"";position:absolute;z-index:2;top:0;left:0;bottom:0;right:0;background:linear-gradient(to bottom, rgba(32,32,32,0) 0%, rgba(32,32,32,0.5) 100%)}.sidebar a{color:#fff;border-bottom-color:rgba(255,255,255,0.2);text-shadow:2px 2px 4px rgba(0,0,0,0.5)}.right-side{width:100%;margin-left:auto;margin-right:auto}.right-side .ad-first{text-align:center}@media screen{.right-side{max-width:38rem;min-height:100vh}.right-side .ad-second{display:none}}@media screen and (min-width: 54em){.right-side{margin-left:20rem;margin-right:1rem;padding:4rem 1rem 12rem}.right-side .ad-second{text-align:center;display:block}}@media screen and (min-width: 72em){.right-side{margin-left:22rem;max-width:42rem}}@media screen and (min-width: 88em){.right-side{width:162px;margin-left:0rem;margin-right:0rem;padding:0rem;margin-top:10rem;display:block;float:left}}@media screen and (min-width: 96em){.right-side{width:300px;margin-right:0rem}}#_yDrawer{position:relative}@media screen{#_yDrawer{min-height:640px;min-height:100vh}}@media screen and (min-width: 54em){#_yDrawer{width:18rem;margin-left:0}}.sidebar-bg{position:absolute;height:100%;overflow:hidden;top:0;right:0;bottom:0;left:0;background:#202020 center / cover}.sidebar-box{display:flex;justify-content:center}.sidebar-sticky{position:relative;z-index:3}@media screen{.sidebar-sticky{-ms-overflow-style:none;overflow:-moz-scrollbars-none;height:100%;overflow:auto;position:absolute;padding:3rem 0rem;right:2.5rem;left:2.5rem}}.sidebar-sticky::-webkit-scrollbar{display:none}.sidebar-about>h1{color:#fff;font-size:2rem}.sidebar-nav>ul{list-style:none;padding-left:0;margin-bottom:0.5rem}a.sidebar-nav-item{width:100%;font-weight:normal;display:block;line-height:1.75;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.2)}a.sidebar-nav-subitem{font-weight:normal;display:block;line-height:1.75;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.2)}@media screen{.y-drawer-scrim{z-index:2}.y-drawer-content{width:18rem;left:-18rem;z-index:3}}.sidebar-social{margin-bottom:.5rem}.sidebar-social>ul{list-style:none;padding-left:0;margin:0 -.25rem}.sidebar-social>ul>li{float:left}.sidebar-social>ul>li>a{display:inline-block;text-align:center;font-size:1.6rem;line-height:3rem;width:3.1249rem;height:4rem;padding:.5rem 0}.sidebar-social>ul li+li{margin-top:0}.fixed-top{position:fixed;top:0;left:0;width:100%;z-index:1}.navbar>.content{padding-top:0;padding-bottom:0;min-height:0;height:0}.menu{display:inline-block;padding:1.75rem 1.5rem;border-bottom:none;margin-left:-1.5rem;color:#9a9a9a !important}.menu::after{content:"\2630"}@media screen and (min-width: 54em){.menu{padding:1.25rem 1.5rem;position:absolute;left:-9999px}.menu:focus{position:static}}.animation-main{pointer-events:none}.loading{display:none}@media print{.menu{display:none}}.animation-main{opacity:0;will-change:opacity}.loading{position:absolute;top:0;right:0;padding:5.25rem 4.5rem;transform-origin:top right;transform:scale(0.33)}.content{position:relative;margin-left:auto;margin-right:auto;padding:5rem 1rem 12rem}@media screen{.content{min-height:100vh}}@media screen and (min-width: 54em){.content{padding:4rem 1rem 12rem;margin-left:19rem;margin-right:3rem}}@media screen and (min-width: 72em){.content{max-width:42rem;margin-left:21rem}}@media screen and (min-width: 88em){.content{float:left;width:100%;margin-left:22rem;margin-right:5rem}}@media screen and (min-width: 96em){.content{max-width:60rem}}@media screen and (min-width: 102em){.content{margin-left:25rem;margin-right:8rem}}.me{width:6.5rem;height:6.5rem;align-self:center;margin-right:20px;border-radius:100%;position:relative}@media screen and (min-width: 40em){.me{width:7rem;height:7rem}}@media screen and (min-width: 54em){.me{width:6.5rem;height:6.5rem}}@media screen and (min-width: 72em){.me{width:7rem;height:7rem}}main>footer{width:100%;position:absolute;bottom:0;left:0;right:0;padding:0 1rem;color:#9a9a9a;font-size:smaller;text-align:center}main>footer>p{margin-bottom:0}html{font-family:'Nanum Gothic', 'sans-serif'}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6,.heading{font-family:'Nanum Gothic', 'sans-serif'}
+
+</style>
+<!--[if gt IE 8]>-->
+<style>
+  
+  @import url(https://fonts.googleapis.com/earlyaccess/nanumgothic.css);article,aside,dialog,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}mark{background:#FF0;color:#000}*{box-sizing:border-box}html,body{margin:0;padding:0}html{font-size:16px;line-height:1.75}body{color:#333;background-color:#fff;overflow-y:scroll}a{text-decoration:none}.lead{margin-left:-1rem;margin-right:-1rem}img,.img{display:block;max-width:100%;margin-bottom:1rem;border:none}img.lead,.img.lead{max-width:calc(100% + 2rem);width:calc(100% + 2rem)}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6,.heading{font-weight:bold;text-rendering:optimizeLegibility}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6{margin:1.6rem 0 1rem;line-height:1.6}h1,.h1{font-size:2rem;line-height:1.25}h2,.h2{font-size:1.5rem}h3,.h3{font-size:1.17em}p{margin-top:0;margin-bottom:1rem}p.lead{font-size:1.25rem;font-weight:300;padding:0 1rem}ul,ol,dl{margin-top:0;margin-bottom:1rem}ul,ol{padding-left:1.25rem}hr{position:relative;margin:2rem 0 3rem 0;border:0;border-top:1px solid #eee}.hr{padding-bottom:.5rem;border-bottom:1px solid #eee;margin-bottom:1.5rem}h4,h5,h6,.h4,.h5,.h6{margin-bottom:0.5rem;font-size:1rem}table{margin-bottom:1rem;width:100%;width:calc(100% + 2rem);margin-left:-1rem;border:1px solid #e5e5e5;border-collapse:collapse;border-spacing:0}td,th{padding:.25rem .5rem;border:1px solid #e5e5e5}td:first-child,th:first-child{padding-left:1rem}td:last-child,th:last-child{padding-right:1rem}thead+tbody,tbody+tbody,tfoot{border-top:3px double #e5e5e5}tbody tr:nth-child(odd) td,tbody tr:nth-child(odd) th{background-color:#f9f9f9}footer{margin-bottom:2rem}.page,.post{margin-bottom:3em}.page li+li,.post li+li{margin-top:.25rem}.page>header,.post>header{margin-bottom:2rem}.page-title,.post-title{margin-top:0}.post-date{display:block;margin-top:-0.5rem;margin-bottom:1rem;color:#9a9a9a}.related-posts{padding-left:0;list-style:none}.related-posts>li,.related-posts>li+li{margin-top:1rem}.related-posts>li>small,.related-posts>li+li>small{font-size:75%;color:#9a9a9a}.message{margin-bottom:1rem;padding:1rem;color:#787878;background-color:#f9f9f9;margin-left:-1rem;margin-right:-1rem}body,main{position:relative;overflow-x:hidden}@media screen{body::before{content:'';background:#e5e5e5;position:absolute;left:0;top:0;bottom:0}}@media screen and (min-width: 40em){html{font-size:17px}}@media screen and (min-width: 54em){html{font-size:16px}}@media screen and (min-width: 88em){html{font-size:15px}}@media screen and (min-width: 125em){html{font-size:18px}}.sr-only{display:none}.clearfix,.sidebar-social::after,.clearafter::after{content:"";display:table;clear:both}a,.a{position:relative;padding-bottom:.15rem;border-style:hidden}.img{overflow:hidden;background-color:#f9f9f9}.img>img{margin:0;width:100%;height:100%}.sixteen-nine{position:relative}.sixteen-nine::before{display:block;content:"";width:100%;padding-top:56.25%}.sixteen-nine>*{position:absolute;top:0;left:0;right:0;bottom:0}h1+hr,h2+hr,h3+hr,h4+hr,h5+hr,h6+hr{margin-top:0}.fade-in{animation-duration:500ms;animation-name:fade-in;animation-fill-mode:forwards}@keyframes fade-in{from{transform:translateY(-2rem);opacity:0}50%{transform:translateY(-2rem);opacity:0}to{transform:translateY(0);opacity:1}}.mb6{margin-bottom:10rem}.sidebar{color:rgba(255,255,255,0.75);text-align:left}.sidebar::before{content:"";position:absolute;z-index:2;top:0;left:0;bottom:0;right:0;background:linear-gradient(to bottom, rgba(32,32,32,0) 0%, rgba(32,32,32,0.5) 100%)}.sidebar a{color:#fff;border-bottom-color:rgba(255,255,255,0.2);text-shadow:2px 2px 4px rgba(0,0,0,0.5)}.right-side{width:100%;margin-left:auto;margin-right:auto}.right-side .ad-first{text-align:center}@media screen{.right-side{max-width:38rem;min-height:100vh}.right-side .ad-second{display:none}}@media screen and (min-width: 54em){.right-side{margin-left:20rem;margin-right:1rem;padding:4rem 1rem 12rem}.right-side .ad-second{text-align:center;display:block}}@media screen and (min-width: 72em){.right-side{margin-left:22rem;max-width:42rem}}@media screen and (min-width: 88em){.right-side{width:162px;margin-left:0rem;margin-right:0rem;padding:0rem;margin-top:10rem;display:block;float:left}}@media screen and (min-width: 96em){.right-side{width:300px;margin-right:0rem}}#_yDrawer{position:relative}@media screen{#_yDrawer{min-height:640px;min-height:100vh}}@media screen and (min-width: 54em){#_yDrawer{width:18rem;margin-left:0}}.sidebar-bg{position:absolute;height:100%;overflow:hidden;top:0;right:0;bottom:0;left:0;background:#202020 center / cover}.sidebar-box{display:flex;justify-content:center}.sidebar-sticky{position:relative;z-index:3}@media screen{.sidebar-sticky{-ms-overflow-style:none;overflow:-moz-scrollbars-none;height:100%;overflow:auto;position:absolute;padding:3rem 0rem;right:2.5rem;left:2.5rem}}.sidebar-sticky::-webkit-scrollbar{display:none}.sidebar-about>h1{color:#fff;font-size:2rem}.sidebar-nav>ul{list-style:none;padding-left:0;margin-bottom:0.5rem}a.sidebar-nav-item{width:100%;font-weight:normal;display:block;line-height:1.75;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.2)}a.sidebar-nav-subitem{font-weight:normal;display:block;line-height:1.75;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.2)}@media screen{.y-drawer-scrim{z-index:2}.y-drawer-content{width:18rem;left:-18rem;z-index:3}}.sidebar-social{margin-bottom:.5rem}.sidebar-social>ul{list-style:none;padding-left:0;margin:0 -.25rem}.sidebar-social>ul>li{float:left}.sidebar-social>ul>li>a{display:inline-block;text-align:center;font-size:1.6rem;line-height:3rem;width:3.1249rem;height:4rem;padding:.5rem 0}.sidebar-social>ul li+li{margin-top:0}.fixed-top{position:fixed;top:0;left:0;width:100%;z-index:1}.navbar>.content{padding-top:0;padding-bottom:0;min-height:0;height:0}.menu{display:inline-block;padding:1.75rem 1.5rem;border-bottom:none;margin-left:-1.5rem;color:#9a9a9a !important}.menu::after{content:"\2630"}@media screen and (min-width: 54em){.menu{padding:1.25rem 1.5rem;position:absolute;left:-9999px}.menu:focus{position:static}}.animation-main{pointer-events:none}.loading{display:none}@media print{.menu{display:none}}.animation-main{opacity:0;will-change:opacity}.loading{position:absolute;top:0;right:0;padding:5.25rem 4.5rem;transform-origin:top right;transform:scale(0.33)}.content{position:relative;margin-left:auto;margin-right:auto;padding:5rem 1rem 12rem}@media screen{.content{min-height:100vh}}@media screen and (min-width: 54em){.content{padding:4rem 1rem 12rem;margin-left:19rem;margin-right:3rem}}@media screen and (min-width: 72em){.content{max-width:42rem;margin-left:21rem}}@media screen and (min-width: 88em){.content{float:left;width:100%;margin-left:22rem;margin-right:5rem}}@media screen and (min-width: 96em){.content{max-width:60rem}}@media screen and (min-width: 102em){.content{margin-left:25rem;margin-right:8rem}}.me{width:6.5rem;height:6.5rem;align-self:center;margin-right:20px;border-radius:100%;position:relative}@media screen and (min-width: 40em){.me{width:7rem;height:7rem}}@media screen and (min-width: 54em){.me{width:6.5rem;height:6.5rem}}@media screen and (min-width: 72em){.me{width:7rem;height:7rem}}main>footer{width:100%;position:absolute;bottom:0;left:0;right:0;padding:0 1rem;color:#9a9a9a;font-size:smaller;text-align:center}main>footer>p{margin-bottom:0}html{font-family:'Nanum Gothic', 'sans-serif'}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6,.heading{font-family:'Nanum Gothic', 'sans-serif'}
+
+</style>
+
+
+<link rel="preload" href="http://localhost:4000/assets/css/hydejack.css?v=6.4.0" as="style" onload="this.rel='stylesheet'">
+
+<style id="_pageStyle">
+
+.content a{color:#4f86aa;border-color:rgba(79,134,170,0.2)}.content a:hover{border-color:#4f86aa}:focus{outline-color:#4f86aa}::selection{color:#fff;background:#4f86aa}::-moz-selection{color:#fff;background:#4f86aa}
+
+</style>
+
+
+<noscript>
+  <link rel="stylesheet" href="http://localhost:4000/assets/css/hydejack.css?v=6.4.0">
+  
+  
+  
+
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <style>
+      html { font-family: 'Noto Sans KR', 'sans-serif' }
+      h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, .heading { font-family: 'Noto Sans KR', 'sans-serif' }
+    </style>
+  
+
+  
+  <link rel="stylesheet" href="http://localhost:4000/assets/icomoon/style.css">
+</noscript>
+<!--<![endif]-->
+
+</head>
+
+<body>
+  <!-- =============== -->
+<!-- MENU            -->
+<!-- =============== -->
+<div class="navbar fixed-top">
+  <div class="content">
+    <span class="sr-only">Jump to:</span>
+    <a id="_menu" class="menu no-hover" href="#_title">
+      <span class="sr-only">Menu</span>
+    </a>
+  </div>
+</div>
+
+<!-- =============== -->
+<!-- CONTENT         -->
+<!-- =============== -->
+<div id="_yPushState">
+  <div class="fade-in">
+    <main id="_main" class="content" role="main" data-color="#4f86aa" data-image="/assets/img/main-left.jpeg">
+      <!--<div style="text-align: center;">&lt;!&ndash; 조회수 노출 HITS &ndash;&gt;
+        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/03/02/09-nest-database/"
+           target="_blank">
+          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/03/02/09-nest-database/.svg" /></a>
+      </div>-->
+      
+
+<article id="post-dev/2024/03/02/09-nest-database" class="post" role="article">
+  <header>
+    <h1 class="post-title">
+      
+        [NestJs] 영속화 - 데이터베이스 다루기
+      
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-02T00:00:00+09:00">2024-03-02</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <div class="markdown-body">
+
+
+<br/>
+      <ul>
+  <li><a href="#1-mysql-설정">1. MySQL 설정</a></li>
+  <li><a href="#2-typeorm으로-데이터베이스-연결">2. TypeORM으로 데이터베이스 연결</a></li>
+  <li><a href="#3-회원-가입-요청한-유저의-정보-저장">3. 회원 가입 요청한 유저의 정보 저장</a></li>
+  <li><a href="#4-트랜잭션-적용">4. 트랜잭션 적용</a>
+    <ul>
+      <li><a href="#41-queryrunner-사용">4.1 QueryRunner 사용</a></li>
+      <li><a href="#42-transaction-함수-이용">4.2 transaction 함수 이용</a></li>
+    </ul>
+  </li>
+  <li><a href="#5-마이그레이션">5. 마이그레이션</a></li>
+</ul>
+
+<hr />
+
+<p>이번 포스트에서는 MySQL과 TypeORM을 사용하여 데이터를 다루어보도록 한다.</p>
+
+<h1 id="1-mysql-설정">1. MySQL 설정</h1>
+
+<p>MySQL 설치 및 실행은 아래 블로그를 확인하기 바란다.
+https://velog.io/@yeawonbong/MySQL</p>
+
+<h1 id="2-typeorm으로-데이터베이스-연결">2. TypeORM으로 데이터베이스 연결</h1>
+
+<p>typeorm 라이브러리를 설치한다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm i typeorm @nestjs/typeorm mysql2
+</code></pre></div></div>
+
+<p>TypeOrmModule을 이용하여 DB에 연결한다.</p>
+
+<ul>
+  <li>app.module.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Module</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">UsersModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./users/users.module</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">ConfigModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/config</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">emailConfig</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./config/emailConfig</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">validationSchema</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./config/validationSchema</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">TypeOrmModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/typeorm</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span>
+    <span class="nx">UsersModule</span><span class="p">,</span>
+    <span class="nx">ConfigModule</span><span class="p">.</span><span class="nx">forRoot</span><span class="p">({</span>
+      <span class="na">envFilePath</span><span class="p">:</span> <span class="p">[</span><span class="s2">`</span><span class="p">${</span><span class="nx">__dirname</span><span class="p">}</span><span class="s2">/config/env/.</span><span class="p">${</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span><span class="p">}</span><span class="s2">.env`</span><span class="p">],</span>
+      <span class="na">load</span><span class="p">:</span> <span class="p">[</span><span class="nx">emailConfig</span><span class="p">],</span>
+      <span class="na">isGlobal</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="nx">validationSchema</span><span class="p">,</span>
+    <span class="p">}),</span>
+    <span class="c1">// TypeOrmModule을 동적 모듈로 가지고 온다.</span>
+    <span class="nx">TypeOrmModule</span><span class="p">.</span><span class="nx">forRoot</span><span class="p">({</span>
+      <span class="na">type</span><span class="p">:</span> <span class="dl">"</span><span class="s2">mysql</span><span class="dl">"</span><span class="p">,</span> <span class="c1">// 데어터베이스 타입</span>
+      <span class="na">host</span><span class="p">:</span> <span class="dl">"</span><span class="s2">localhost</span><span class="dl">"</span><span class="p">,</span>
+      <span class="na">port</span><span class="p">:</span> <span class="mi">3306</span><span class="p">,</span>
+      <span class="na">username</span><span class="p">:</span> <span class="dl">"</span><span class="s2">root</span><span class="dl">"</span><span class="p">,</span>
+      <span class="na">password</span><span class="p">:</span> <span class="dl">"</span><span class="s2">test</span><span class="dl">"</span><span class="p">,</span>
+      <span class="na">database</span><span class="p">:</span> <span class="dl">"</span><span class="s2">test</span><span class="dl">"</span><span class="p">,</span>
+      <span class="na">entities</span><span class="p">:</span> <span class="p">[</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">/**/*.entity{.ts,.js}</span><span class="dl">"</span><span class="p">],</span> <span class="c1">// 소스 코드 내에서 TypeORM이 구동될 때 인식하도록 할 엔티티 클래스 경로</span>
+      <span class="na">synchronize</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// 서비스 구동 시 소스 코드 기반으로 데이터베이스 스키마를 동기화할지 여부. 로컬에서만 true로 설정.</span>
+    <span class="p">}),</span>
+  <span class="p">],</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">[],</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[],</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">AppModule</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<p>forRoot에 전달되는 TypeOrmModuleOptions 시그니처</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="nx">type</span> <span class="nx">TypeOrmModuleOptions</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="cm">/**
+   * Number of times to retry connecting
+   * Default: 10
+   */</span>
+  <span class="nx">retryAttempts</span><span class="p">?:</span> <span class="nx">number</span><span class="p">,</span>
+  <span class="cm">/**
+   * Delay between connection retry attempts (ms)
+   * Default: 3000
+   */</span>
+  <span class="nx">retryDelay</span><span class="p">?:</span> <span class="nx">number</span><span class="p">,</span>
+  <span class="cm">/**
+   * Function that determines whether the module should
+   * attempt to connect upon failure.
+   *
+   * @param err error that was thrown
+   * @returns whether to retry connection or not
+   */</span>
+  <span class="nx">toRetry</span><span class="p">?:</span> <span class="p">(</span><span class="na">err</span><span class="p">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">boolean</span><span class="p">,</span>
+  <span class="cm">/**
+   * If `true`, entities will be loaded automatically.
+   */</span>
+  <span class="nx">autoLoadEntities</span><span class="p">?:</span> <span class="nx">boolean</span><span class="p">,</span>
+  <span class="cm">/**
+   * If `true`, connection will not be closed on application shutdown.
+   * @deprecated
+   */</span>
+  <span class="nx">keepConnectionAlive</span><span class="p">?:</span> <span class="nx">boolean</span><span class="p">,</span>
+  <span class="cm">/**
+   * If `true`, will show verbose error messages on each connection retry.
+   */</span>
+  <span class="nx">verboseRetryLog</span><span class="p">?:</span> <span class="nx">boolean</span><span class="p">,</span>
+  <span class="cm">/**
+   * If `true` database initialization will not be performed during module initialization.
+   * This means that database connection will not be established and migrations will not run.
+   * Database initialization will have to be performed manually using `DataSource.initialize`
+   * and it will have to implement own retry mechanism (if necessary).
+   */</span>
+  <span class="nx">manualInitialization</span><span class="p">?:</span> <span class="nx">boolean</span><span class="p">,</span>
+<span class="p">}</span> <span class="o">&amp;</span> <span class="nx">Partial</span><span class="o">&lt;</span><span class="nx">DataSourceOptions</span><span class="o">&gt;</span><span class="p">;</span>
+</code></pre></div></div>
+
+<ul>
+  <li>retryAttempts : 연결 시 재시도 횟수, 기본은 10</li>
+  <li>retryDelay : 재시도 간 지연시간, 기본 3000 ms</li>
+  <li>toRetry : 에러 시 연결을 시도할 지 판단하는 함수. 콜백으로 받은 인수 err 을 이용하여 연결 여부를 판단하는 함수를 구현</li>
+  <li>autoLoadEntities : entity 를 자동으로 로드할 지 여부</li>
+  <li>keepConnectionAlive: 애플리케이션 종료 후 연결을 유지할 지 여부</li>
+  <li>verboseRetryLog : 연결 재시도 시 verbose 레벨로 에러 메시지를 보여줄 지 여부</li>
+</ul>
+
+<p>TypeOrmModuleOptions는 위의 타입과 DataSourceOptions 타입을 교차한 타입. 이 옵션 외의 세부 옵션은 MysqlConnectionOptions를 살펴보아야 한다.</p>
+
+<p>TypeOrmModuleOptions 객체를 환경 변수에서 값을 읽어도록 변경.</p>
+
+<ul>
+  <li>/config/env/.development.env</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+DATABASE_HOST=localhost
+DATABASE_USERNAME=root
+DATABASE_PASSWORD=test
+DATABASE_SYNCHRONIZE=true
+</code></pre></div></div>
+
+<ul>
+  <li>app.module.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">...</span>
+    <span class="c1">// TypeOrmModule을 동적 모듈로 가지고 온다.</span>
+    <span class="nx">TypeOrmModule</span><span class="p">.</span><span class="nx">forRoot</span><span class="p">({</span>
+      <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">mysql</span><span class="dl">'</span><span class="p">,</span> <span class="c1">// 데어터베이스 타입</span>
+      <span class="na">host</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DATABASE_HOST</span><span class="p">,</span>
+      <span class="na">port</span><span class="p">:</span> <span class="mi">3306</span><span class="p">,</span>
+      <span class="na">username</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DATABASE_USERNAME</span><span class="p">,</span>
+      <span class="na">password</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DATABASE_PASSWORD</span><span class="p">,</span>
+      <span class="na">database</span><span class="p">:</span> <span class="dl">'</span><span class="s1">test</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">entities</span><span class="p">:</span> <span class="p">[</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">/**/*.entity{.ts,.js}</span><span class="dl">'</span><span class="p">],</span> <span class="c1">// 소스 코드 내에서 TypeORM이 구동될 때 인식하도록 할 엔티티 클래스 경로</span>
+      <span class="na">synchronize</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DATABASE_SYNCHRONIZE</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">true</span><span class="dl">'</span><span class="p">,</span> <span class="c1">// 서비스 구동 시 소스 코드 기반으로 데이터베이스 스키마를 동기화할지 여부. 로컬에서만 true로 설정.</span>
+    <span class="p">}),</span>
+  <span class="p">],</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<h1 id="3-회원-가입-요청한-유저의-정보-저장">3. 회원 가입 요청한 유저의 정보 저장</h1>
+
+<p>유저 엔티티 정의</p>
+
+<ul>
+  <li>src/users/entity/user.entity.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Column</span><span class="p">,</span> <span class="nx">Entity</span><span class="p">,</span> <span class="nx">PrimaryColumn</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">typeorm</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Entity</span><span class="p">(</span><span class="dl">"</span><span class="s2">User</span><span class="dl">"</span><span class="p">)</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">UserEntity</span> <span class="p">{</span>
+  <span class="p">@</span><span class="nd">PrimaryColumn</span><span class="p">()</span>
+  <span class="nx">id</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+
+  <span class="p">@</span><span class="nd">Column</span><span class="p">({</span> <span class="na">length</span><span class="p">:</span> <span class="mi">30</span> <span class="p">})</span>
+  <span class="nx">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+
+  <span class="p">@</span><span class="nd">Column</span><span class="p">({</span> <span class="na">length</span><span class="p">:</span> <span class="mi">60</span> <span class="p">})</span>
+  <span class="nx">email</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+
+  <span class="p">@</span><span class="nd">Column</span><span class="p">({</span> <span class="na">length</span><span class="p">:</span> <span class="mi">30</span> <span class="p">})</span>
+  <span class="nx">password</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+
+  <span class="p">@</span><span class="nd">Column</span><span class="p">({</span> <span class="na">length</span><span class="p">:</span> <span class="mi">60</span> <span class="p">})</span>
+  <span class="nx">signupVerifyToken</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>데이터베이스 사용하도록 함수 구현</p>
+
+<ul>
+  <li>users.module.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Module</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">UsersController</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./users.controller</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">UsersService</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./users.service</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">EmailModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">src/email/email.module</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">TypeOrmModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/typeorm</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">UserEntity</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./entity/user.entity</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span><span class="nx">EmailModule</span><span class="p">,</span> <span class="nx">TypeOrmModule</span><span class="p">.</span><span class="nx">forFeature</span><span class="p">([</span><span class="nx">UserEntity</span><span class="p">])],</span> <span class="c1">// UserEntity Repository 등록</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">[</span><span class="nx">UsersController</span><span class="p">],</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[</span><span class="nx">UsersService</span><span class="p">],</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">UsersModule</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>users.service.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+<span class="p">@</span><span class="nd">Injectable</span><span class="p">()</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">UsersService</span> <span class="p">{</span>
+  <span class="kd">constructor</span><span class="p">(</span>
+    <span class="kr">private</span> <span class="nx">emailService</span><span class="p">:</span> <span class="nx">EmailService</span><span class="p">,</span>
+    <span class="p">@</span><span class="nd">InjectRepository</span><span class="p">(</span><span class="nx">UserEntity</span><span class="p">)</span>
+    <span class="kr">private</span> <span class="nx">userRepository</span><span class="p">:</span> <span class="nx">Repository</span><span class="o">&lt;</span><span class="nx">UserEntity</span><span class="o">&gt;</span><span class="p">,</span> <span class="c1">// inject repository</span>
+  <span class="p">)</span> <span class="p">{}</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<ul>
+  <li>users.service.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+  <span class="k">async</span> <span class="nx">createUser</span><span class="p">(</span>
+    <span class="nx">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">email</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">password</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+  <span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="k">void</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">userExist</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">checkUserExists</span><span class="p">(</span><span class="nx">email</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">userExist</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="nx">UnprocessableEntityException</span><span class="p">(</span>
+        <span class="dl">'</span><span class="s1">해당 이메일로는 가입할 수 없습니다.</span><span class="dl">'</span><span class="p">,</span>
+      <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">const</span> <span class="nx">signupVerifyToken</span> <span class="o">=</span> <span class="nx">uuid</span><span class="p">.</span><span class="nx">v1</span><span class="p">();</span>
+
+    <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">saveUser</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">,</span> <span class="nx">password</span><span class="p">,</span> <span class="nx">signupVerifyToken</span><span class="p">);</span>
+    <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">sendMemberJoinEmail</span><span class="p">(</span><span class="nx">email</span><span class="p">,</span> <span class="nx">signupVerifyToken</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">...</span>
+  <span class="kr">private</span> <span class="k">async</span> <span class="nx">checkUserExists</span><span class="p">(</span><span class="nx">email</span><span class="p">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">user</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">userRepository</span><span class="p">.</span><span class="nx">findOne</span><span class="p">({</span>
+      <span class="na">where</span><span class="p">:</span> <span class="p">{</span> <span class="nx">email</span> <span class="p">},</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="nx">user</span> <span class="o">!=</span> <span class="kc">undefined</span><span class="p">;</span> <span class="c1">// TODO: DB 연동 후 구현</span>
+  <span class="p">}</span>
+<span class="p">...</span>
+  <span class="kr">private</span> <span class="k">async</span> <span class="nx">saveUser</span><span class="p">(</span>
+    <span class="nx">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">email</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">password</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">signupVerifyToken</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+  <span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UserEntity</span><span class="p">();</span>
+    <span class="nx">user</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">uuid</span><span class="p">.</span><span class="nx">v1</span><span class="p">();</span>
+    <span class="nx">user</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+    <span class="nx">user</span><span class="p">.</span><span class="nx">email</span> <span class="o">=</span> <span class="nx">email</span><span class="p">;</span>
+    <span class="nx">user</span><span class="p">.</span><span class="nx">password</span> <span class="o">=</span> <span class="nx">password</span><span class="p">;</span>
+    <span class="nx">user</span><span class="p">.</span><span class="nx">signupVerifyToken</span> <span class="o">=</span> <span class="nx">signupVerifyToken</span><span class="p">;</span>
+
+    <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">userRepository</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<h1 id="4-트랜잭션-적용">4. 트랜잭션 적용</h1>
+
+<p>트랜잭션은 요청을 처리하는 과정에서 데이터베이스에 변경이 일어나는 요청을 분리해서 에러 발생시 이전 상태로 되돌리게 하기 위해 데이터베이스에서 제공하는 기능이다.
+TypeORM에서 트랜잭션은 2가지 방법으로 사용할 수 있다.</p>
+
+<ul>
+  <li>QueryRunner를 이용해서 DB 커넥션 상태 생성 및 관리</li>
+  <li>transaction 함수 사용</li>
+</ul>
+
+<h2 id="41-queryrunner-사용">4.1 QueryRunner 사용</h2>
+
+<ul>
+  <li>user.service.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+  <span class="kr">private</span> <span class="k">async</span> <span class="nx">saveUserUsingQueryRunner</span><span class="p">(</span>
+    <span class="nx">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">email</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">password</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">signupVerifyToken</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+  <span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">queryRunner</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">dataSource</span><span class="p">.</span><span class="nx">createQueryRunner</span><span class="p">();</span> <span class="c1">// QueryRunner 생성</span>
+
+    <span class="k">await</span> <span class="nx">queryRunner</span><span class="p">.</span><span class="nx">connect</span><span class="p">();</span> <span class="c1">// 연결</span>
+    <span class="k">await</span> <span class="nx">queryRunner</span><span class="p">.</span><span class="nx">startTransaction</span><span class="p">();</span> <span class="c1">// 트랜잭션 시작</span>
+
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="nx">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UserEntity</span><span class="p">();</span>
+      <span class="nx">user</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">uuid</span><span class="p">.</span><span class="nx">v1</span><span class="p">();</span>
+      <span class="nx">user</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+      <span class="nx">user</span><span class="p">.</span><span class="nx">email</span> <span class="o">=</span> <span class="nx">email</span><span class="p">;</span>
+      <span class="nx">user</span><span class="p">.</span><span class="nx">password</span> <span class="o">=</span> <span class="nx">password</span><span class="p">;</span>
+      <span class="nx">user</span><span class="p">.</span><span class="nx">signupVerifyToken</span> <span class="o">=</span> <span class="nx">signupVerifyToken</span><span class="p">;</span>
+
+      <span class="k">await</span> <span class="nx">queryRunner</span><span class="p">.</span><span class="nx">manager</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span> <span class="c1">// 저장</span>
+
+      <span class="k">await</span> <span class="nx">queryRunner</span><span class="p">.</span><span class="nx">commitTransaction</span><span class="p">();</span> <span class="c1">// 커밋</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">await</span> <span class="nx">queryRunner</span><span class="p">.</span><span class="nx">rollbackTransaction</span><span class="p">();</span> <span class="c1">// 에러 발생시 롤백</span>
+    <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+      <span class="k">await</span> <span class="nx">queryRunner</span><span class="p">.</span><span class="nx">release</span><span class="p">();</span> <span class="c1">// 생성한 QueryRunner는 해제한다.</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<h2 id="42-transaction-함수-이용">4.2 transaction 함수 이용</h2>
+
+<ul>
+  <li>user.service.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+  <span class="kr">private</span> <span class="k">async</span> <span class="nx">saveUserUsingTransaction</span><span class="p">(</span>
+    <span class="nx">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">email</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">password</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+    <span class="nx">signupVerifyToken</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+  <span class="p">)</span> <span class="p">{</span>
+    <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nx">dataSource</span><span class="p">.</span><span class="nx">transaction</span><span class="p">(</span><span class="k">async</span> <span class="p">(</span><span class="nx">manager</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="nx">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UserEntity</span><span class="p">();</span>
+      <span class="nx">user</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">uuid</span><span class="p">.</span><span class="nx">v1</span><span class="p">();</span>
+      <span class="nx">user</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+      <span class="nx">user</span><span class="p">.</span><span class="nx">email</span> <span class="o">=</span> <span class="nx">email</span><span class="p">;</span>
+      <span class="nx">user</span><span class="p">.</span><span class="nx">password</span> <span class="o">=</span> <span class="nx">password</span><span class="p">;</span>
+      <span class="nx">user</span><span class="p">.</span><span class="nx">signupVerifyToken</span> <span class="o">=</span> <span class="nx">signupVerifyToken</span><span class="p">;</span>
+
+      <span class="k">await</span> <span class="nx">manager</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<h1 id="5-마이그레이션">5. 마이그레이션</h1>
+
+<p>데이터베이스 스키마 변경시 마이그레이션을 한다. TypeORM에서 제공하는 마이그레이션을 사용하면 SQL 문을 직접 작성하지 않아도 되고 롤백 작업도 쉽게 수행할 수 있다.</p>
+
+<p>먼저 ts-node 패키지를 글로벌 환경으로 설치해서 typeorm cli를 실행할 수 있게 한다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm i <span class="nt">-g</span> ts-node
+</code></pre></div></div>
+
+<p>pacakage.json 에 typeorm 실행 스크립트를 작성한다.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+  </span><span class="err">...</span><span class="w">
+  </span><span class="nl">"typeorm:create"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ts-node -r ts-node/register ./node_modules/typeorm/cli.js"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"typeorm:generate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ts-node -r ts-node/register ./node_modules/typeorm/cli.js -d ormconfig.ts"</span><span class="w">
+  </span><span class="err">...</span><span class="w">
+</span></code></pre></div></div>
+
+<p>root에 ormconfig.ts 파일을 생성한다.</p>
+
+<ul>
+  <li>ormconfig.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">DataSource</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">typeorm</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">AppDataSource</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DataSource</span><span class="p">({</span>
+  <span class="na">type</span><span class="p">:</span> <span class="dl">"</span><span class="s2">mysql</span><span class="dl">"</span><span class="p">,</span>
+  <span class="na">host</span><span class="p">:</span> <span class="dl">"</span><span class="s2">localhost</span><span class="dl">"</span><span class="p">,</span>
+  <span class="na">port</span><span class="p">:</span> <span class="mi">13306</span><span class="p">,</span>
+  <span class="na">username</span><span class="p">:</span> <span class="dl">"</span><span class="s2">root</span><span class="dl">"</span><span class="p">,</span>
+  <span class="na">password</span><span class="p">:</span> <span class="dl">"</span><span class="s2">password</span><span class="dl">"</span><span class="p">,</span>
+  <span class="na">database</span><span class="p">:</span> <span class="dl">"</span><span class="s2">test</span><span class="dl">"</span><span class="p">,</span>
+  <span class="na">entities</span><span class="p">:</span> <span class="p">[</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">/**/*.entity{.ts,.js}</span><span class="dl">"</span><span class="p">],</span>
+  <span class="na">synchronize</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+  <span class="na">migrations</span><span class="p">:</span> <span class="p">[</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">/**/migrations/**/*{.ts,.js}</span><span class="dl">"</span><span class="p">],</span>
+  <span class="na">migrationsTableName</span><span class="p">:</span> <span class="dl">"</span><span class="s2">migrations</span><span class="dl">"</span><span class="p">,</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<ul>
+  <li>tsconfig.json</li>
+</ul>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="err">...</span><span class="w">
+  </span><span class="nl">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"src/**/*"</span><span class="p">]</span><span class="w">
+  </span><span class="err">...</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<ul>
+  <li>app.module.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+    <span class="nx">TypeOrmModule</span><span class="p">.</span><span class="nx">forRoot</span><span class="p">({</span>
+      <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">mysql</span><span class="dl">'</span><span class="p">,</span> <span class="c1">// 데어터베이스 타입</span>
+      <span class="na">host</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DATABASE_HOST</span><span class="p">,</span>
+      <span class="na">port</span><span class="p">:</span> <span class="mi">3306</span><span class="p">,</span>
+      <span class="na">username</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DATABASE_USERNAME</span><span class="p">,</span>
+      <span class="na">password</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DATABASE_PASSWORD</span><span class="p">,</span>
+      <span class="na">database</span><span class="p">:</span> <span class="dl">'</span><span class="s1">test</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">entities</span><span class="p">:</span> <span class="p">[</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">/**/*.entity{.ts,.js}</span><span class="dl">'</span><span class="p">],</span> <span class="c1">// 소스 코드 내에서 TypeORM이 구동될 때 인식하도록 할 엔티티 클래스 경로</span>
+      <span class="c1">// synchronize: process.env.DATABASE_SYNCHRONIZE === 'true', // 서비스 구동 시 소스 코드 기반으로 데이터베이스 스키마를 동기화할지 여부. 로컬에서만 true로 설정.</span>
+      <span class="na">synchronize</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="c1">// 마이그레이션 테스트를 위해 변경</span>
+      <span class="na">migrationsRun</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="c1">// 서버 구동 시 자동으로 마이그레이션 하지 않도록 설정. cli로만 직접 입력한다.</span>
+      <span class="na">migrations</span><span class="p">:</span> <span class="p">[</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">/**/migrations/*.js</span><span class="dl">'</span><span class="p">],</span> <span class="c1">// 마이그레이션 스크립트 경로</span>
+      <span class="na">migrationsTableName</span><span class="p">:</span> <span class="dl">'</span><span class="s1">migrations</span><span class="dl">'</span><span class="p">,</span> <span class="c1">// 마이그레이션 이력 기록되는 테이블 이름</span>
+    <span class="p">}),</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<p>User 테이블 삭제한 후 서버를 재시동한다.</p>
+
+<ul>
+  <li>migration:create: 수행할 마이그레이션 내용이 비어 있는 파일 생성</li>
+  <li>migration:generate: 현재 소스 코드와 migrations 테이블에 기록된 이력을 기반으로 마이그레이션 파일 자동 생성</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm run typeorm migration:create src/migrations/CreateUserTable
+</code></pre></div></div>
+
+<p>아래와 같은 파일이 생성된다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">MigrationInterface</span><span class="p">,</span> <span class="nx">QueryRunner</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">typeorm</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CreateUserTable1709375389995</span> <span class="kr">implements</span> <span class="nx">MigrationInterface</span> <span class="p">{</span>
+	<span class="c1">// migration:run 수행 시 실행</span>
+    <span class="kr">public</span> <span class="k">async</span> <span class="nx">up</span><span class="p">(</span><span class="nx">queryRunner</span><span class="p">:</span> <span class="nx">QueryRunner</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="k">void</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="p">}</span>
+	<span class="c1">// migration:revert 수행 시 실행</span>
+    <span class="kr">public</span> <span class="k">async</span> <span class="nx">down</span><span class="p">(</span><span class="nx">queryRunner</span><span class="p">:</span> <span class="nx">QueryRunner</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="k">void</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>migration 코드를 cli로 생성해보자.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm run typeorm:generate migration:generate src/migrations/CreateUserTable
+</code></pre></div></div>
+
+<p>아래와 같은 파일이 생성된다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">MigrationInterface</span><span class="p">,</span> <span class="nx">QueryRunner</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">typeorm</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CreateUserTable1709376266709</span> <span class="kr">implements</span> <span class="nx">MigrationInterface</span> <span class="p">{</span>
+  <span class="nx">name</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">CreateUserTable1709376266709</span><span class="dl">'</span><span class="p">;</span>
+
+  <span class="kr">public</span> <span class="k">async</span> <span class="nx">up</span><span class="p">(</span><span class="nx">queryRunner</span><span class="p">:</span> <span class="nx">QueryRunner</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="k">void</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">await</span> <span class="nx">queryRunner</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span>
+      <span class="s2">`CREATE TABLE </span><span class="se">\`</span><span class="s2">User</span><span class="se">\`</span><span class="s2"> (</span><span class="se">\`</span><span class="s2">id</span><span class="se">\`</span><span class="s2"> varchar(255) NOT NULL, </span><span class="se">\`</span><span class="s2">name</span><span class="se">\`</span><span class="s2"> varchar(30) NOT NULL, </span><span class="se">\`</span><span class="s2">email</span><span class="se">\`</span><span class="s2"> varchar(60) NOT NULL, </span><span class="se">\`</span><span class="s2">password</span><span class="se">\`</span><span class="s2"> varchar(30) NOT NULL, </span><span class="se">\`</span><span class="s2">signupVerifyToken</span><span class="se">\`</span><span class="s2"> varchar(60) NOT NULL, PRIMARY KEY (</span><span class="se">\`</span><span class="s2">id</span><span class="se">\`</span><span class="s2">)) ENGINE=InnoDB`</span><span class="p">,</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="kr">public</span> <span class="k">async</span> <span class="nx">down</span><span class="p">(</span><span class="nx">queryRunner</span><span class="p">:</span> <span class="nx">QueryRunner</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="k">void</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">await</span> <span class="nx">queryRunner</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="s2">`DROP TABLE </span><span class="se">\`</span><span class="s2">User</span><span class="se">\`</span><span class="s2">`</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>마이그레이션을 실행해보자.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm run typeorm:generate migration:run
+</code></pre></div></div>
+
+<p>마이그레이션을 되돌려보자.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm run typeorm:generate migration:revert
+</code></pre></div></div>
+
+<hr />
+
+<p><em>본 포스트는 한용재 저자의 <strong>NestJS로 배우는 백엔드 프로그래밍</strong>을 기반으로 스터디하며 정리한 내용들입니다.</em></p>
+
+<ul>
+  <li><a href="http://www.yes24.com/Product/Goods/115850682">NestJS로 배우는 백엔드 프로그래밍</a></li>
+</ul>
+
+      <br/>
+      <br/>
+    </div>
+    <script>
+
+    </script>
+  
+
+</article>
+
+  <hr class="dingbat" />
+
+  <div class="share">
+      <h2>Share this post</h2>
+      <div class="share-body">
+        <a href="http://twitter.com/share?text=[NestJs] 영속화 - 데이터베이스 다루기&amp;url=http://localhost:4000/dev/2024/03/02/09-nest-database/"
+    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <span class="icon-twitter">
+            </span>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/03/02/09-nest-database/"
+    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="icon-facebook">
+            </span>
+        </a>
+    </div>
+  </div>
+  <br/>
+
+
+
+
+
+
+  <aside class="author" role="complementary">
+    <div class="author">
+  <h2 class="page-title hr">
+    About
+  </h2>
+<div class="author-body">
+  
+    
+  
+
+  
+
+  <img
+    src="/assets/img/me.jpg"
+    class="me"
+    alt="gmin"
+    srcset="/assets/img/me.jpg 1x,/assets/img/me.jpg 2x"
+    
+  />
+
+
+  
+  <div class="author-body-description">
+    <p>기술을 통해 사람을 돕고 세상을 이롭게 하는 삶을 지향합니다.</p>
+
+  </div>
+</div>
+</div>
+
+  </aside>
+
+
+
+
+
+<aside class="related" role="complementary">
+  <h2 class="hr">Related Posts</h2>
+
+  <ul class="related-posts">
+    
+      
+      
+      
+        
+        
+          
+
+
+<li class="h4">
+  <a href="/dev/2024/03/04/18-nest-clean-architecture/" data-flip="title">
+    <span>[NestJs] 클린 아키텍처</span>
+  </a>
+  <small><time datetime="2024-03-04T00:00:00+09:00">
+    2024-03-04
+  </time></small>
+</li>
+
+        
+      
+        
+        
+          
+
+
+<li class="h4">
+  <a href="/dev/2024/03/03/17-nest-cqrs/" data-flip="title">
+    <span>[NestJs] CQRS</span>
+  </a>
+  <small><time datetime="2024-03-03T00:00:00+09:00">
+    2024-03-03
+  </time></small>
+</li>
+
+        
+      
+        
+        
+          
+
+
+<li class="h4">
+  <a href="/dev/2024/03/03/16-nest-cron/" data-flip="title">
+    <span>[NestJs] 태스크 스케줄링</span>
+  </a>
+  <small><time datetime="2024-03-03T00:00:00+09:00">
+    2024-03-03
+  </time></small>
+</li>
+
+        
+      
+        
+        
+      
+    
+  </ul>
+</aside>
+
+
+
+      <footer>
+  <hr />
+   <p>© 2024.02. by Gmin.Y</p>
+ 
+  <p>
+    <code>Powered by <a href="https://gminiy.github.io/">gminiy</a></code>
+  </p>
+</footer>
+
+    </main>
+    <div class="right-side">
+<br/>
+  <div class="ad-second">
+  </div>
+</div>
+
+  </div>
+  <div id="_yDrawer">
+  <div id="_sidebar" class="sidebar">
+    <div class="sidebar-bg" style="background-color:#4f86aa;background-image:url(/assets/img/main-left.jpeg)"></div>
+    <header class="sidebar-sticky" role="banner">
+      <br/>
+      <div class="sidebar-about">
+        <h1><a id="_title" href="/">Gmin.Y Blog</a></h1>
+        <p>세상을 이롭게 하는 기술</p>
+
+      </div>
+
+      <br/>
+      <br/>
+      <nav class="sidebar-nav heading" role="navigation">
+        <span class="sr-only">Navigation:</span>
+<ul>
+  
+
+  
+
+  
+  
+  
+  
+  
+    <li>
+      <input type="checkbox" id="list-item-1"/>
+      <div  class="list-wrapper">
+      <a class="sidebar-nav-item" href="/category/dev/">DEV</a>
+       <label class="folder" for="list-item-1">▾</label>
+    </div>
+    <div>
+     <ul class="list-body">
+       
+           
+             <li>
+               <a class="sidebar-nav-subitem" href="/tag/dev-nestjs/">NestJs</a>
+             </li>
+           
+         
+           
+             <li>
+               <a class="sidebar-nav-subitem" href="/tag/dev-typescript/">TypeScript</a>
+             </li>
+           
+         
+     </ul>
+    </div>
+    </li>
+
+  
+  
+    <li>
+      <input type="checkbox" id="list-item-2"/>
+      <div  class="list-wrapper">
+      <a class="sidebar-nav-item" href="/about/">About</a>
+       
+    </div>
+    <div>
+     <ul class="list-body">
+       
+           
+         
+           
+         
+     </ul>
+    </div>
+    </li>
+
+  
+</ul>
+
+      </nav>
+    <br/>
+
+    <form action="/search">
+      <div class="tipue_search_left">
+        <img src="/assets/tipuesearch/search.png" class="tipue_search_icon">
+      </div>
+      <div class="tipue_search_right">
+        <input type="text" name="q" id="tipue_search_input" pattern=".{1,}" title="At least 1 characters" required></div>
+      <div style="clear: both;"></div>
+    </form>
+
+    <br/>
+      <div class="sidebar-box">
+        
+          
+  
+
+  
+
+  <img
+    src="/assets/img/me.jpg"
+    class="me"
+    alt="gmin"
+    srcset="/assets/img/me.jpg 1x,/assets/img/me.jpg 2x"
+    
+  />
+
+
+        
+      </div>
+      
+
+      
+      
+        <div class="sidebar-social">
+          <span class="sr-only">Social:</span>
+<ul>
+  
+    
+
+
+
+
+
+
+
+
+
+<li>
+  <a href="https://instagram.com/gmin_87">
+    <span class="icon-instagram" title="Instagram"></span>
+    <span class="sr-only">Instagram</span>
+  </a>
+</li>
+
+  
+    
+
+
+
+
+
+
+
+
+
+<li>
+  <a href="https://github.com/gminiy">
+    <span class="icon-github" title="GitHub"></span>
+    <span class="sr-only">GitHub</span>
+  </a>
+</li>
+
+  
+    
+
+
+
+
+
+
+
+
+
+<li>
+  <a href="mailto:gmini.y@gmail.com">
+    <span class="icon-mail" title="Email"></span>
+    <span class="sr-only">Email</span>
+  </a>
+</li>
+
+  
+</ul>
+
+        </div>
+      
+    </header>
+  </div>
+</div>
+
+</div>
+
+<!-- =============== -->
+<!-- SCRIPTS         -->
+<!-- =============== -->
+
+<script>
+  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+  ga('create', 'UA-176737306-1', 'auto');
+  ga('send', 'pageview');
+  loadJSDeferred('https://www.google-analytics.com/analytics.js');
+</script>
+
+
+
+
+
+<!--[if gt IE 8]><!---->
+<script src="//ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+<script>
+  WebFont.load({
+    
+    google: {
+      families: 'Lato'.split('|')
+    },
+    
+
+    custom: {
+      families: ['icomoon'],
+      urls: ['/assets/icomoon/style.css']
+    }
+  });
+</script>
+<!--<![endif]-->
+
+
+  <!--[if gt IE 9]>-->
+  <script>loadJSDeferred('');</script>
+
+  
+  <!--<![endif]-->
+
+
+
+</body>
+
+</html>

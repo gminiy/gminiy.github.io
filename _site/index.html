@@ -183,10 +183,855 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
       
   
 
-<article id="post-dev/2024/02/28/nest-dynamic-module-env-config" class="post mb6" role="article">
+<article id="post-dev/2024/03/04/18-nest-clean-architecture" class="post mb6" role="article">
   <header>
     <h1 class="post-title">
-      <a href="/dev/2024/02/28/nest-dynamic-module-env-config/" data-flip="title">
+      <a href="/dev/2024/03/04/18-nest-clean-architecture/" data-flip="title">
+        [NestJs] 클린 아키텍처
+      </a>
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-04T00:00:00+09:00">2024-03-04</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <ul>
+  <li><a href="#1-클린-아키텍처">1. 클린 아키텍처</a></li>
+  <li><a href="#2-solid-객체-지향-설계-원칙">2. SOLID 객체 지향 설계 원칙</a></li>
+  <li><a href="#3-유저-서비스에-클린-아키텍처-적용하기">3. 유저 서비스에 클린 아키텍처 적용하기</a>
+    <ul>
+      <li><a href="#31-도메인-레이어">3.1 도메인 레이어</a></li>
+      <li><a href="#32-어플리케이션-레이어">3.2 어플리케이션 레이어</a></li>
+      <li><a href="#33-인터페이스-레이어">3.3 인터페이스 레이어</a></li>
+      <li><a href="#34-인프라-레이어">3.4 인프라 레이어</a></li>
+      <li><a href="#35-이메일-모듈">3.5 이메일 모듈</a></li>
+    </ul>
+  </li>
+</ul>
+
+
+    <p class="read-more"><a class="heading" href="/dev/2024/03/04/18-nest-clean-architecture/" data-flip="title">Continue reading </a></p>
+  
+
+</article>
+
+
+
+  
+
+<article id="post-dev/2024/03/03/17-nest-cqrs" class="post mb6" role="article">
+  <header>
+    <h1 class="post-title">
+      <a href="/dev/2024/03/03/17-nest-cqrs/" data-flip="title">
+        [NestJs] CQRS
+      </a>
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-03T00:00:00+09:00">2024-03-03</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <ul>
+  <li><a href="#1-cqrs-패턴">1. CQRS 패턴</a></li>
+  <li><a href="#2-유저-서비스에-cqrs-적용하기">2. 유저 서비스에 CQRS 적용하기</a>
+    <ul>
+      <li><a href="#21-커맨드">2.1 커맨드</a></li>
+      <li><a href="#22-이벤트">2.2 이벤트</a></li>
+      <li><a href="#23-쿼리">2.3 쿼리</a></li>
+    </ul>
+  </li>
+</ul>
+
+
+    <p class="read-more"><a class="heading" href="/dev/2024/03/03/17-nest-cqrs/" data-flip="title">Continue reading </a></p>
+  
+
+</article>
+
+
+
+  
+
+<article id="post-dev/2024/03/03/16-nest-cron" class="post mb6" role="article">
+  <header>
+    <h1 class="post-title">
+      <a href="/dev/2024/03/03/16-nest-cron/" data-flip="title">
+        [NestJs] 태스크 스케줄링
+      </a>
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-03T00:00:00+09:00">2024-03-03</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <ul>
+  <li><a href="#1-nestjsschedule-패키지">1. @nestjs/schedule 패키지</a></li>
+  <li><a href="#2-태스크-스케줄링을-선언하는-방식">2. 태스크 스케줄링을 선언하는 방식</a>
+    <ul>
+      <li><a href="#21-크론-잡-선언-방식">2.1 크론 잡 선언 방식</a></li>
+      <li><a href="#22-인터벌-선언-방식">2.2 인터벌 선언 방식</a></li>
+      <li><a href="#23-타임아웃-선언-방식">2.3 타임아웃 선언 방식</a></li>
+    </ul>
+  </li>
+  <li><a href="#3-동적-태스크-스케줄링">3. 동적 태스크 스케줄링</a></li>
+</ul>
+
+
+    <p class="read-more"><a class="heading" href="/dev/2024/03/03/16-nest-cron/" data-flip="title">Continue reading </a></p>
+  
+
+</article>
+
+
+
+  
+
+<article id="post-dev/2024/03/03/15-nest-health-check" class="post mb6" role="article">
+  <header>
+    <h1 class="post-title">
+      <a href="/dev/2024/03/03/15-nest-health-check/" data-flip="title">
+        [NestJs] 헬스 체크
+      </a>
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-03T00:00:00+09:00">2024-03-03</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <ul>
+  <li><a href="#1-terminus-적용">1. Terminus 적용</a></li>
+  <li><a href="#2-헬스-체크">2. 헬스 체크</a></li>
+  <li><a href="#3-typeorm-헬스-체크">3. TypeOrm 헬스 체크</a></li>
+  <li><a href="#4-커스텀-상태-표시기">4. 커스텀 상태 표시기</a></li>
+</ul>
+
+
+    <p class="read-more"><a class="heading" href="/dev/2024/03/03/15-nest-health-check/" data-flip="title">Continue reading </a></p>
+  
+
+</article>
+
+
+
+  
+
+<article id="post-dev/2024/03/03/14-nest-interceptor" class="post mb6" role="article">
+  <header>
+    <h1 class="post-title">
+      <a href="/dev/2024/03/03/14-nest-interceptor/" data-flip="title">
+        [NestJs] 인터셉터
+      </a>
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-03T00:00:00+09:00">2024-03-03</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <ul>
+  <li><a href="#1-인터셉터">1. 인터셉터</a></li>
+  <li><a href="#2-응답과-예외-매핑">2. 응답과 예외 매핑</a></li>
+  <li><a href="#3-유저-서비스에-인터셉터-적용하기">3. 유저 서비스에 인터셉터 적용하기</a></li>
+</ul>
+
+
+    <p class="read-more"><a class="heading" href="/dev/2024/03/03/14-nest-interceptor/" data-flip="title">Continue reading </a></p>
+  
+
+</article>
+
+
+
+  
+
+<article id="post-dev/2024/03/03/13-nest-exception" class="post mb6" role="article">
+  <header>
+    <h1 class="post-title">
+      <a href="/dev/2024/03/03/13-nest-exception/" data-flip="title">
+        [NestJs] 예외 처리
+      </a>
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-03T00:00:00+09:00">2024-03-03</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <ul>
+  <li><a href="#1-예외처리">1. 예외 처리</a></li>
+  <li><a href="#2-예외-필터">2. 예외 필터</a></li>
+  <li><a href="#3-유저-서비스에-예외-필터-적용하기">3. 유저 서비스에 예외 필터 적용하기</a></li>
+</ul>
+
+
+    <p class="read-more"><a class="heading" href="/dev/2024/03/03/13-nest-exception/" data-flip="title">Continue reading </a></p>
+  
+
+</article>
+
+
+
+  
+
+<article id="post-dev/2024/03/03/12-nest-logger copy" class="post mb6" role="article">
+  <header>
+    <h1 class="post-title">
+      <a href="/dev/2024/03/03/12-nest-logger-copy/" data-flip="title">
+        [NestJs] 로깅
+      </a>
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-03T00:00:00+09:00">2024-03-03</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <ul>
+  <li><a href="#1-내장-로거">1. 내장 로거</a>
+    <ul>
+      <li><a href="#11-로깅-비활성화">1.1 로깅 비활성화</a></li>
+      <li><a href="#12-로그-레벨-지정">1.2 로그 레벨 지정</a></li>
+    </ul>
+  </li>
+  <li><a href="#2-커스텀-로거">2. 커스텀 로거</a>
+    <ul>
+      <li><a href="#21-커스텀-로거-주입">2.1 커스텀 로거 주입</a></li>
+      <li><a href="#22-커스텀-로거-전역-사용">2.2 커스텀 로거 전역 사용</a></li>
+    </ul>
+  </li>
+  <li><a href="#3-유저-서비스에-winston-외부-로거-적용하기">3. 유저 서비스에 winston 외부 로거 적용하기</a>
+    <ul>
+      <li><a href="#31-nest-winston-적용">3.1 nest-winston 적용</a></li>
+      <li><a href="#32-내장-로거-대체하기">3.2 내장 로거 대체하기</a></li>
+      <li><a href="#33-부트스래핑까지-포함하여-내장-로거-대체">3.3 부트스래핑까지 포함하여 내장 로거 대체</a></li>
+    </ul>
+  </li>
+</ul>
+
+
+    <p class="read-more"><a class="heading" href="/dev/2024/03/03/12-nest-logger-copy/" data-flip="title">Continue reading </a></p>
+  
+
+</article>
+
+
+
+  
+
+<article id="post-dev/2024/03/02/11-nest-guard" class="post mb6" role="article">
+  <header>
+    <h1 class="post-title">
+      <a href="/dev/2024/03/02/11-nest-guard/" data-flip="title">
+        [NestJs] 권한 확인을 위한 가드
+      </a>
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-02T00:00:00+09:00">2024-03-02</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <ul>
+  <li><a href="#1-가드">1. 가드</a></li>
+  <li><a href="#2-가드를-이용한-인가">2. 가드를 이용한 인가</a>
+    <ul>
+      <li><a href="#21-실행-콘텍스트-executioncontext">2.1 실행 콘텍스트 (ExecutionContext)</a></li>
+      <li><a href="#22-가드-적용">2.2 가드 적용</a></li>
+    </ul>
+  </li>
+  <li><a href="#3-유저-서비스의-이메일-인증-처리와-jwt-발급">3. 유저 서비스의 이메일 인증 처리와 JWT 발급</a>
+    <ul>
+      <li><a href="#31-회원-가입-이메일-인증">3.1 회원 가입 이메일 인증</a></li>
+      <li><a href="#32-jwt-인증">3.2 JWT 인증</a></li>
+      <li><a href="#33-가드를-이용한-인가-처리">3.3 가드를 이용한 인가 처리</a></li>
+    </ul>
+  </li>
+  <li><a href="#4-커스텀-매개변수-데커레이터">4. 커스텀 매개변수 데커레이터</a>
+    <ul>
+      <li><a href="#41-유저-정보-추출-커스텀-데커레이터">4.1 유저 정보 추출 커스텀 데커레이터</a></li>
+    </ul>
+  </li>
+</ul>
+
+
+    <p class="read-more"><a class="heading" href="/dev/2024/03/02/11-nest-guard/" data-flip="title">Continue reading </a></p>
+  
+
+</article>
+
+
+
+  
+
+<article id="post-dev/2024/03/02/10-nest-middleware" class="post mb6" role="article">
+  <header>
+    <h1 class="post-title">
+      <a href="/dev/2024/03/02/10-nest-middleware/" data-flip="title">
+        [NestJs] 미들웨어
+      </a>
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-02T00:00:00+09:00">2024-03-02</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <ul>
+  <li><a href="#1-미들웨어">1. 미들웨어</a></li>
+  <li><a href="#2-logger-미들웨어">2. Logger 미들웨어</a></li>
+  <li><a href="#3-middlewareconsumer">3. MiddlewareConsumer</a></li>
+  <li><a href="#4-전역으로-적용하기">4. 전역으로 적용하기</a></li>
+</ul>
+
+
+    <p class="read-more"><a class="heading" href="/dev/2024/03/02/10-nest-middleware/" data-flip="title">Continue reading </a></p>
+  
+
+</article>
+
+
+
+  
+
+<article id="post-dev/2024/03/02/09-nest-database" class="post mb6" role="article">
+  <header>
+    <h1 class="post-title">
+      <a href="/dev/2024/03/02/09-nest-database/" data-flip="title">
+        [NestJs] 영속화 - 데이터베이스 다루기
+      </a>
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-02T00:00:00+09:00">2024-03-02</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <ul>
+  <li><a href="#1-mysql-설정">1. MySQL 설정</a></li>
+  <li><a href="#2-typeorm으로-데이터베이스-연결">2. TypeORM으로 데이터베이스 연결</a></li>
+  <li><a href="#3-회원-가입-요청한-유저의-정보-저장">3. 회원 가입 요청한 유저의 정보 저장</a></li>
+  <li><a href="#4-트랜잭션-적용">4. 트랜잭션 적용</a>
+    <ul>
+      <li><a href="#41-queryrunner-사용">4.1 QueryRunner 사용</a></li>
+      <li><a href="#42-transaction-함수-이용">4.2 transaction 함수 이용</a></li>
+    </ul>
+  </li>
+  <li><a href="#5-마이그레이션">5. 마이그레이션</a></li>
+</ul>
+
+
+    <p class="read-more"><a class="heading" href="/dev/2024/03/02/09-nest-database/" data-flip="title">Continue reading </a></p>
+  
+
+</article>
+
+
+
+  
+
+<article id="post-dev/2024/03/02/08-nest-pipe-validation-check" class="post mb6" role="article">
+  <header>
+    <h1 class="post-title">
+      <a href="/dev/2024/03/02/08-nest-pipe-validation-check/" data-flip="title">
+        [NestJs] 파이프와 유효성 검사
+      </a>
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-02T00:00:00+09:00">2024-03-02</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <ul>
+  <li><a href="#1-파이프">1. 파이프</a></li>
+  <li><a href="#2-파이프의-내부-구현-이해하기">2. 파이프의 내부 구현 이해하기</a></li>
+  <li><a href="#3-유효성-검사-파이프-만들기">3. 유효성 검사 파이프 만들기</a></li>
+  <li><a href="#4-유저-서비스에-유효성-검사-적용">4. 유저 서비스에 유효성 검사 적용</a>
+    <ul>
+      <li><a href="#41-유저-생성-body-유효성-검사">4.1 유저 생성 body 유효성 검사</a></li>
+      <li><a href="#42-class-transformer-활용">4.2 class-transformer 활용</a></li>
+      <li><a href="#43-커스텀-유효성-검사기">4.3 커스텀 유효성 검사기</a></li>
+    </ul>
+  </li>
+</ul>
+
+
+    <p class="read-more"><a class="heading" href="/dev/2024/03/02/08-nest-pipe-validation-check/" data-flip="title">Continue reading </a></p>
+  
+
+</article>
+
+
+
+  
+
+<article id="post-dev/2024/03/02/02-typescript-item2" class="post mb6" role="article">
+  <header>
+    <h1 class="post-title">
+      <a href="/dev/2024/03/02/02-typescript-item2/" data-flip="title">
+        [TypeScript] 타입스크립트 설정
+      </a>
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-02T00:00:00+09:00">2024-03-02</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-typescript/" data-flip="title">TypeScript</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <ul>
+  <li>tsconfig.json을 통해 타입스크립트 옵션을 설정해야 동료들과 다른 도구들이 알 수 있다.</li>
+</ul>
+
+
+    <p class="read-more"><a class="heading" href="/dev/2024/03/02/02-typescript-item2/" data-flip="title">Continue reading </a></p>
+  
+
+</article>
+
+
+
+  
+
+<article id="post-dev/2024/03/02/01-typescript-item1" class="post mb6" role="article">
+  <header>
+    <h1 class="post-title">
+      <a href="/dev/2024/03/02/01-typescript-item1/" data-flip="title">
+        [TypeScript] 타입스크립트와 자바스크립트
+      </a>
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-02T00:00:00+09:00">2024-03-02</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-typescript/" data-flip="title">TypeScript</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <ul>
+  <li>타입스크립트는 자바스크립트의 상위집합으로 모든 자바 스크립트 프로그램은 타입스크립트 프로그램이다. 반대로 타입스크립트는 별도의 문법을 가지고 있기 때문에 일반적으로는 유효한 자바스크립트 프로그램이 아니다.</li>
+  <li>타입스크립트는 <strong>자바스크립트 런타임 동작을 모델링하는 타입시스템</strong>을 가지고 있기 때문에 <strong>런타임 오류를 발생시키는 코드</strong>를 찾아내려고 한다. 모든 오류를 찾아내리라 기대해서는 안된다. 타입 체커를 통과해도 런타임 오류를 발생시키는 코드는 많다.</li>
+  <li>잘못된 매개변수 개수로 함수를 호출하는 경우처럼, 자바스크립트에서는 허용되지만 타입스크립트에서는 허용하지 않는 경우가 있다. 문법적 엄격함은 취향의 차이이므로 타입스크립트를 쓸지 이를 고려하여 선택해야 한다.</li>
+</ul>
+
+
+    <p class="read-more"><a class="heading" href="/dev/2024/03/02/01-typescript-item1/" data-flip="title">Continue reading </a></p>
+  
+
+</article>
+
+
+
+  
+
+<article id="post-dev/2024/02/28/07-nest-dynamic-module-env-config" class="post mb6" role="article">
+  <header>
+    <h1 class="post-title">
+      <a href="/dev/2024/02/28/07-nest-dynamic-module-env-config/" data-flip="title">
         [NestJs] 동적 모듈을 활용한 환경 변수 구성
       </a>
     </h1>
@@ -240,7 +1085,7 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 </ul>
 
 
-    <p class="read-more"><a class="heading" href="/dev/2024/02/28/nest-dynamic-module-env-config/" data-flip="title">Continue reading </a></p>
+    <p class="read-more"><a class="heading" href="/dev/2024/02/28/07-nest-dynamic-module-env-config/" data-flip="title">Continue reading </a></p>
   
 
 </article>
@@ -249,10 +1094,10 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 
   
 
-<article id="post-dev/2024/02/27/nest-module" class="post mb6" role="article">
+<article id="post-dev/2024/02/27/06-nest-module" class="post mb6" role="article">
   <header>
     <h1 class="post-title">
-      <a href="/dev/2024/02/27/nest-module/" data-flip="title">
+      <a href="/dev/2024/02/27/06-nest-module/" data-flip="title">
         [NestJs] 모듈 설계
       </a>
     </h1>
@@ -309,7 +1154,7 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 </ul>
 
 
-    <p class="read-more"><a class="heading" href="/dev/2024/02/27/nest-module/" data-flip="title">Continue reading </a></p>
+    <p class="read-more"><a class="heading" href="/dev/2024/02/27/06-nest-module/" data-flip="title">Continue reading </a></p>
   
 
 </article>
@@ -318,10 +1163,10 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 
   
 
-<article id="post-dev/2024/02/25/nest-scope" class="post mb6" role="article">
+<article id="post-dev/2024/02/25/05-nest-scope" class="post mb6" role="article">
   <header>
     <h1 class="post-title">
-      <a href="/dev/2024/02/25/nest-scope/" data-flip="title">
+      <a href="/dev/2024/02/25/05-nest-scope/" data-flip="title">
         [NestJs] 스코프
       </a>
     </h1>
@@ -372,7 +1217,7 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 </ul>
 
 
-    <p class="read-more"><a class="heading" href="/dev/2024/02/25/nest-scope/" data-flip="title">Continue reading </a></p>
+    <p class="read-more"><a class="heading" href="/dev/2024/02/25/05-nest-scope/" data-flip="title">Continue reading </a></p>
   
 
 </article>
@@ -381,10 +1226,10 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 
   
 
-<article id="post-dev/2024/02/25/nest-provider" class="post mb6" role="article">
+<article id="post-dev/2024/02/25/04-nest-provider" class="post mb6" role="article">
   <header>
     <h1 class="post-title">
-      <a href="/dev/2024/02/25/nest-provider/" data-flip="title">
+      <a href="/dev/2024/02/25/04-nest-provider/" data-flip="title">
         [NestJs] 프로바이더
       </a>
     </h1>
@@ -446,7 +1291,7 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 </ul>
 
 
-    <p class="read-more"><a class="heading" href="/dev/2024/02/25/nest-provider/" data-flip="title">Continue reading </a></p>
+    <p class="read-more"><a class="heading" href="/dev/2024/02/25/04-nest-provider/" data-flip="title">Continue reading </a></p>
   
 
 </article>
@@ -455,10 +1300,10 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 
   
 
-<article id="post-dev/2024/02/24/nest-interface" class="post mb6" role="article">
+<article id="post-dev/2024/02/24/03-nest-interface" class="post mb6" role="article">
   <header>
     <h1 class="post-title">
-      <a href="/dev/2024/02/24/nest-interface/" data-flip="title">
+      <a href="/dev/2024/02/24/03-nest-interface/" data-flip="title">
         [NestJs] 인터페이스
       </a>
     </h1>
@@ -518,7 +1363,7 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 </blockquote>
 
 
-    <p class="read-more"><a class="heading" href="/dev/2024/02/24/nest-interface/" data-flip="title">Continue reading </a></p>
+    <p class="read-more"><a class="heading" href="/dev/2024/02/24/03-nest-interface/" data-flip="title">Continue reading </a></p>
   
 
 </article>
@@ -527,10 +1372,10 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 
   
 
-<article id="post-dev/2024/02/23/nest-decorator" class="post mb6" role="article">
+<article id="post-dev/2024/02/23/02-nest-decorator" class="post mb6" role="article">
   <header>
     <h1 class="post-title">
-      <a href="/dev/2024/02/23/nest-decorator/" data-flip="title">
+      <a href="/dev/2024/02/23/02-nest-decorator/" data-flip="title">
         [NestJs] Decorator
       </a>
     </h1>
@@ -582,7 +1427,7 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 </blockquote>
 
 
-    <p class="read-more"><a class="heading" href="/dev/2024/02/23/nest-decorator/" data-flip="title">Continue reading </a></p>
+    <p class="read-more"><a class="heading" href="/dev/2024/02/23/02-nest-decorator/" data-flip="title">Continue reading </a></p>
   
 
 </article>
@@ -591,10 +1436,10 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 
   
 
-<article id="post-dev/2024/02/23/nest-basic" class="post mb6" role="article">
+<article id="post-dev/2024/02/23/01-nest-basic" class="post mb6" role="article">
   <header>
     <h1 class="post-title">
-      <a href="/dev/2024/02/23/nest-basic/" data-flip="title">
+      <a href="/dev/2024/02/23/01-nest-basic/" data-flip="title">
         [NestJs] NestJs 장점 및 설치
       </a>
     </h1>
@@ -645,7 +1490,7 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 </blockquote>
 
 
-    <p class="read-more"><a class="heading" href="/dev/2024/02/23/nest-basic/" data-flip="title">Continue reading </a></p>
+    <p class="read-more"><a class="heading" href="/dev/2024/02/23/01-nest-basic/" data-flip="title">Continue reading </a></p>
   
 
 </article>
@@ -730,7 +1575,7 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
          
            
              <li>
-               <a class="sidebar-nav-subitem" href="/tag/dev-flutter/">Flutter</a>
+               <a class="sidebar-nav-subitem" href="/tag/dev-typescript/">TypeScript</a>
              </li>
            
          

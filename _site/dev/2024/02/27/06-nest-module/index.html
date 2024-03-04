@@ -35,7 +35,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="format-detection" content="telephone=no">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
-<meta property="og:title" content="NestJs">
+<meta property="og:title" content="[NestJs] 모듈 설계">
 <meta property="og:type" content="article">
 
 
@@ -49,13 +49,41 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 
 
 
-  <title>NestJs &middot; Gmin.Y Blog</title>
+  <title>[NestJs] 모듈 설계 &middot; Gmin.Y Blog</title>
 
 
 
 <meta name="description" content="
+  1. 모듈
+    
+      1.1 모듈 다시 내보내기
+      1.2 전역 모듈
+    
+  
+  2. 유저 서비스 모듈 분리
+    
+      2.1 UserModule 분리
+      2.2 EmailModule 분리
+    
+  
+
+
 ">
 <meta property="og:description" content="
+  1. 모듈
+    
+      1.1 모듈 다시 내보내기
+      1.2 전역 모듈
+    
+  
+  2. 유저 서비스 모듈 분리
+    
+      2.1 UserModule 분리
+      2.2 EmailModule 분리
+    
+  
+
+
 ">
 
 
@@ -67,8 +95,8 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <!-- =============== -->
 <!-- LINKS           -->
 <!-- =============== -->
-<link rel="canonical" href="http://localhost:4000/tag/dev-nestjs/">
-<meta property="og:url" content="http://localhost:4000/tag/dev-nestjs/">
+<link rel="canonical" href="http://localhost:4000/dev/2024/02/27/06-nest-module/">
+<meta property="og:url" content="http://localhost:4000/dev/2024/02/27/06-nest-module/">
 <meta name="google-site-verification" content="g4I-a_du23AFdfLFV2vuKYLo_phz8igXQAF3pHc57wA" />
 
 <!-- Google tag (gtag.js) -->
@@ -84,9 +112,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <link rel="alternate" type="application/atom+xml" title="Gmin.Y Blog Feed" href="http://localhost:4000/feed.xml">
 
 
+  <link rel="prev" href="http://localhost:4000/dev/2024/02/25/05-nest-scope/">
 
 
-  <link rel="next" href="http://localhost:4000/tag/dev-typescript/">
+
+  <link rel="next" href="http://localhost:4000/dev/2024/02/28/07-nest-dynamic-module-env-config/">
 
 
 <link rel="apple-touch-icon" href="http://localhost:4000/apple-touch-icon.png">
@@ -178,33 +208,367 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   <div class="fade-in">
     <main id="_main" class="content" role="main" data-color="#4f86aa" data-image="/assets/img/main-left.jpeg">
       <!--<div style="text-align: center;">&lt;!&ndash; 조회수 노출 HITS &ndash;&gt;
-        <a href="http://hits.dwyl.com/localhost:4000/tag/dev-nestjs/"
+        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/02/27/06-nest-module/"
            target="_blank">
-          <img src="http://hits.dwyl.com/localhost:4000/tag/dev-nestjs/.svg" /></a>
+          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/02/27/06-nest-module/.svg" /></a>
       </div>-->
+      
+
+<article id="post-dev/2024/02/27/06-nest-module" class="post" role="article">
+  <header>
+    <h1 class="post-title">
+      
+        [NestJs] 모듈 설계
+      
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-02-27T00:00:00+09:00">2024-02-27</time>
       
 
 
 
-  <header>
-    <h1 class="page-title">NestJs</h1>
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
     
   <div class="hr" style="padding-bottom:0"></div>
 
 
   </header>
-  <hr class="sr-only"/>
-
-
+  
 
   
+    <div class="markdown-body">
+
+
+<br/>
+      <ul>
+  <li><a href="#1-모듈">1. 모듈</a>
+    <ul>
+      <li><a href="#11-모듈-다시-내보내기">1.1 모듈 다시 내보내기</a></li>
+      <li><a href="#12-전역-모듈">1.2 전역 모듈</a></li>
+    </ul>
+  </li>
+  <li><a href="#2-유저-서비스-모듈-분리">2. 유저 서비스 모듈 분리</a>
+    <ul>
+      <li><a href="#21-usermodule-분리">2.1 UserModule 분리</a></li>
+      <li><a href="#22-emailmodule-분리">2.2 EmailModule 분리</a></li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h1 id="1-모듈">1. 모듈</h1>
+
+<p>모듈이란 여러 컴포넌트를 조합하여 더 큰 작업을 수행할 수 있게 하는 단위를 말한다.
+Nest 애플리케이션이 실행되기 위해서는 하나의 루트 모듈이 존재하고 이 루트 모듈은 다른 모듈들로 구성된다. 이를 통해 책임을 나누고 응집도를 높일 수 있다.
+모듈을 어떻게 나눌 것인지는 명확한 기준은 없지만 유사한 기능끼리 모듈로 묶어서 설계하게 될 것이다.</p>
+
+<p>모듈은 @Module 데커레이터를 사용한다. @Module 은 ModuleMetadata를 인수로 받으며 ModuleMetadata는 아래와 같이 정의된다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="nx">declare</span> <span class="kd">function</span> <span class="nx">Module</span><span class="p">(</span><span class="nx">metadata</span><span class="p">:</span> <span class="nx">ModuleMetadata</span><span class="p">):</span> <span class="nx">ClassDecorator</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kr">interface</span> <span class="nx">ModuleMetadata</span> <span class="p">{</span>
+  <span class="nx">imports</span><span class="p">?:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">Type</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span> <span class="o">|</span> <span class="nx">DynamicModule</span> <span class="o">|</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">DynamicModule</span><span class="o">&gt;</span> <span class="o">|</span> <span class="nx">ForwardReference</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="nx">controllers</span><span class="p">?:</span> <span class="nx">Type</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">[];</span>
+  <span class="nx">providers</span><span class="p">?:</span> <span class="nx">Provider</span><span class="p">[];</span>
+  <span class="nx">exports</span><span class="p">?:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">DynamicModule</span> <span class="o">|</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">DynamicModule</span><span class="o">&gt;</span> <span class="o">|</span> <span class="nx">string</span> <span class="o">|</span> <span class="nx">symbol</span> <span class="o">|</span> <span class="nx">Provider</span> <span class="o">|</span> <span class="nx">ForwardReference</span> <span class="o">|</span> <span class="nx">Abstract</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span> <span class="o">|</span> <span class="nb">Function</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>import : 이 모듈에서 사용하기 위한 프로바이더를 가지고 있는 다른 모듈을 가지고 온다.</li>
+  <li>controllers / providers : 컨트롤러와 프로바이더를 모듈에서 사용할수 있도록 Nest가 객체를 생성하고 주입할 수 있게 해준다.</li>
+  <li>exports : 이 모듈에서 제공하는 컴포넌트를 다른 모듈에서 import 해서 사용하고자 한다면 export를 해야한다. export로 선언했다는 뜻은 어디서든 쓸 수 있으므로 public 인터페이스 또는 API로 간주된다.</li>
+</ul>
+
+<hr />
+
+<h2 id="11-모듈-다시-내보내기">1.1 모듈 다시 내보내기</h2>
+
+<p>가져온 모듈은 다시 내보내기가 가능하다. 예를 들어 AppModule이 CoreModule과 CommonModule의 기능이 모두 필요하다면 AppModule은 모두를 가지고 오는 것이 아니라 CoreModule만을 가져오고, CoreModule에서는 CommonModule을 내보내면 AppModule에서 CommonModule을 가지고 오지 않아도 사용할 수 있다.</p>
+
+<ul>
+  <li>CommonModule.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[</span><span class="nx">CommonService</span><span class="p">],</span>
+  <span class="na">exports</span><span class="p">:</span> <span class="p">[</span><span class="nx">CommonService</span><span class="p">],</span> <span class="c1">// CommonService 제공</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CommonModule</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>CommonService.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Injectable</span><span class="p">()</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CommonService</span> <span class="p">{</span>
+  <span class="nx">hello</span><span class="p">():</span> <span class="nx">string</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="dl">"</span><span class="s2">Common Hello~</span><span class="dl">"</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>CoreModule.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span><span class="nx">CommonModule</span><span class="p">],</span>
+  <span class="na">exports</span><span class="p">:</span> <span class="p">[</span><span class="nx">CommonModule</span><span class="p">],</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CoreModule</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>AppModule.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span><span class="nx">CoreModule</span><span class="p">],</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">[</span><span class="nx">AppController</span><span class="p">],</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[</span><span class="nx">AppService</span><span class="p">],</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">AppModule</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>AppController.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Controller</span><span class="p">()</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">AppController</span> <span class="p">{</span>
+  <span class="kd">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">readonly</span> <span class="nx">commonService</span><span class="p">:</span> <span class="nx">CommonService</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="p">@</span><span class="nd">Get</span><span class="p">(</span><span class="dl">'</span><span class="s1">/common-hello</span><span class="dl">'</span><span class="p">)</span>
+  <span class="nx">getCommonHello</span><span class="p">():</span> <span class="nx">string</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">commonService</span><span class="p">.</span><span class="nx">hello</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="12-전역-모듈">1.2 전역 모듈</h2>
+
+<p>Nest는 모듈 범위 내에서 프로바이더를 캡슐화한다. 따라서 어떤 모듈에 있는 프로바이더를 사용하려면 모듈을 먼저 import 해야한다.
+하지만 헬퍼나 DB 연결 등의 전역적으로 쓸 수 있는 프로바이더가 필요한 경우 전역 모듈로 제공할 수 있다.
+전역 모듈은 @Global 데커레이터를 선언한다. 전역 모듈은 루트 모듈이나 코어 모듈에서 한 번만 등록해야 한다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Global</span><span class="p">()</span>
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[</span><span class="nx">CommonService</span><span class="p">],</span>
+  <span class="na">exports</span><span class="p">:</span> <span class="p">[</span><span class="nx">CommonService</span><span class="p">],</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CommonModule</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<hr />
+
+<h1 id="2-유저-서비스-모듈-분리">2. 유저 서비스 모듈 분리</h1>
+
+<p>만들고 있는 유저 서비스는 루트 모듈인 AppModule만 존재한다. 유저 관리 기능을 UserModule로, 이메일 기능은 EmailModule로 분리하는 작업을 진행하자.</p>
+
+<hr />
+
+<h2 id="21-usermodule-분리">2.1 UserModule 분리</h2>
+
+<p>UserModule을 아래 cli 를 통해 생성한다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nest g mo Users
+</code></pre></div></div>
+
+<p>생성된 UserModule에 UserController와 UserService를 추가한다. EmailService를 사용하므로 함께 추가한다.</p>
+
+<ul>
+  <li>user.module.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Module</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">UsersController</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./users.controller</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">UsersService</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./users.service</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">EmailService</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">src/email/email.service</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">imports</span><span class="p">:</span> <span class="p">[],</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">[</span><span class="nx">UsersController</span><span class="p">],</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[</span><span class="nx">UsersService</span><span class="p">,</span> <span class="nx">EmailService</span><span class="p">],</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">UsersModule</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<p>AppModule에 UserModule이 자동으로 import 되어 있고 AppModule에서 UsersController, UsersService, EmailService를 참조할 필요가 없으므로 제거한다.</p>
+
+<ul>
+  <li>app.module.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Module</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">UsersModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./users/users.module</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span><span class="nx">UsersModule</span><span class="p">],</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">[],</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[],</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">AppModule</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="22-emailmodule-분리">2.2 EmailModule 분리</h2>
+
+<p>이메일 모듈을 생성한다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nest g mo Email
+</code></pre></div></div>
+
+<p>생성된 EmailModule에서 EmailService를 UserModule에서 사용할수 있도록 exports 해준다.</p>
+
+<ul>
+  <li>email.module.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Module</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">EmailService</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./email.service</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[</span><span class="nx">EmailService</span><span class="p">],</span>
+  <span class="na">exports</span><span class="p">:</span> <span class="p">[</span><span class="nx">EmailService</span><span class="p">],</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">EmailModule</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<p>UsersModule에서 EmailModule을 import해주고 EmailService는 삭제한다.</p>
+
+<ul>
+  <li>users.module.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Module</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">UsersController</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./users.controller</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">UsersService</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./users.service</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">EmailModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">src/email/email.module</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span><span class="nx">EmailModule</span><span class="p">],</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">[</span><span class="nx">UsersController</span><span class="p">],</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[</span><span class="nx">UsersService</span><span class="p">],</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">UsersModule</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<hr />
+
+<p><em>본 포스트는 한용재 저자의 <strong>NestJS로 배우는 백엔드 프로그래밍</strong>을 기반으로 스터디하며 정리한 내용들입니다.</em></p>
+
+<ul>
+  <li><a href="http://www.yes24.com/Product/Goods/115850682">NestJS로 배우는 백엔드 프로그래밍</a></li>
+</ul>
+
+      <br/>
+      <br/>
+    </div>
+    <script>
+
+    </script>
+  
+
+</article>
+
+  <hr class="dingbat" />
+
+  <div class="share">
+      <h2>Share this post</h2>
+      <div class="share-body">
+        <a href="http://twitter.com/share?text=[NestJs] 모듈 설계&amp;url=http://localhost:4000/dev/2024/02/27/06-nest-module/"
+    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <span class="icon-twitter">
+            </span>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/02/27/06-nest-module/"
+    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="icon-facebook">
+            </span>
+        </a>
+    </div>
+  </div>
+  <br/>
+
+
+
+
+
+
+  <aside class="author" role="complementary">
+    <div class="author">
+  <h2 class="page-title hr">
+    About
+  </h2>
+<div class="author-body">
   
     
-    <h2 id="y2024" class="hr">2024</h2>
-    <ul class="related-posts">
+  
+
+  
+
+  <img
+    src="/assets/img/me.jpg"
+    class="me"
+    alt="gmin"
+    srcset="/assets/img/me.jpg 1x,/assets/img/me.jpg 2x"
     
+  />
+
+
   
-  
+  <div class="author-body-description">
+    <p>기술을 통해 사람을 돕고 세상을 이롭게 하는 삶을 지향합니다.</p>
+
+  </div>
+</div>
+</div>
+
+  </aside>
+
+
+
+
+
+<aside class="related" role="complementary">
+  <h2 class="hr">Related Posts</h2>
+
+  <ul class="related-posts">
+    
+      
+      
+      
+        
+        
+          
 
 
 <li class="h4">
@@ -216,11 +580,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
-  
-
-  
-  
-  
+        
+      
+        
+        
+          
 
 
 <li class="h4">
@@ -232,11 +596,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
-  
-
-  
-  
-  
+        
+      
+        
+        
+          
 
 
 <li class="h4">
@@ -248,247 +612,14 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/03/15-nest-health-check/" data-flip="title">
-    <span>[NestJs] 헬스 체크</span>
-  </a>
-  <small><time datetime="2024-03-03T00:00:00+09:00">
-    2024-03-03
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/03/14-nest-interceptor/" data-flip="title">
-    <span>[NestJs] 인터셉터</span>
-  </a>
-  <small><time datetime="2024-03-03T00:00:00+09:00">
-    2024-03-03
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/03/13-nest-exception/" data-flip="title">
-    <span>[NestJs] 예외 처리</span>
-  </a>
-  <small><time datetime="2024-03-03T00:00:00+09:00">
-    2024-03-03
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/03/12-nest-logger-copy/" data-flip="title">
-    <span>[NestJs] 로깅</span>
-  </a>
-  <small><time datetime="2024-03-03T00:00:00+09:00">
-    2024-03-03
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/02/11-nest-guard/" data-flip="title">
-    <span>[NestJs] 권한 확인을 위한 가드</span>
-  </a>
-  <small><time datetime="2024-03-02T00:00:00+09:00">
-    2024-03-02
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/02/10-nest-middleware/" data-flip="title">
-    <span>[NestJs] 미들웨어</span>
-  </a>
-  <small><time datetime="2024-03-02T00:00:00+09:00">
-    2024-03-02
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/02/09-nest-database/" data-flip="title">
-    <span>[NestJs] 영속화 - 데이터베이스 다루기</span>
-  </a>
-  <small><time datetime="2024-03-02T00:00:00+09:00">
-    2024-03-02
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/02/08-nest-pipe-validation-check/" data-flip="title">
-    <span>[NestJs] 파이프와 유효성 검사</span>
-  </a>
-  <small><time datetime="2024-03-02T00:00:00+09:00">
-    2024-03-02
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/28/07-nest-dynamic-module-env-config/" data-flip="title">
-    <span>[NestJs] 동적 모듈을 활용한 환경 변수 구성</span>
-  </a>
-  <small><time datetime="2024-02-28T00:00:00+09:00">
-    2024-02-28
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/27/06-nest-module/" data-flip="title">
-    <span>[NestJs] 모듈 설계</span>
-  </a>
-  <small><time datetime="2024-02-27T00:00:00+09:00">
-    2024-02-27
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/25/05-nest-scope/" data-flip="title">
-    <span>[NestJs] 스코프</span>
-  </a>
-  <small><time datetime="2024-02-25T00:00:00+09:00">
-    2024-02-25
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/25/04-nest-provider/" data-flip="title">
-    <span>[NestJs] 프로바이더</span>
-  </a>
-  <small><time datetime="2024-02-25T00:00:00+09:00">
-    2024-02-25
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/24/03-nest-interface/" data-flip="title">
-    <span>[NestJs] 인터페이스</span>
-  </a>
-  <small><time datetime="2024-02-24T00:00:00+09:00">
-    2024-02-24
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/23/02-nest-decorator/" data-flip="title">
-    <span>[NestJs] Decorator</span>
-  </a>
-  <small><time datetime="2024-02-23T00:00:00+09:00">
-    2024-02-23
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/23/01-nest-basic/" data-flip="title">
-    <span>[NestJs] NestJs 장점 및 설치</span>
-  </a>
-  <small><time datetime="2024-02-23T00:00:00+09:00">
-    2024-02-23
-  </time></small>
-</li>
-
+        
+      
+        
+        
+      
+    
   </ul>
+</aside>
 
 
 
@@ -545,7 +676,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
        
            
              <li>
-               <a class="sidebar-nav-subitem active" href="/tag/dev-nestjs/">NestJs</a>
+               <a class="sidebar-nav-subitem" href="/tag/dev-nestjs/">NestJs</a>
              </li>
            
          

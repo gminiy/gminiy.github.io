@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="/assets/lib/jquery-1.12.0.min.js"></script>
+<script src="/assets/lib/jquery.magnific-popup.min.js"></script>
+<script src="/assets/js/index.js"></script>
+<!--
+ __  __                __                                     __
+/\ \/\ \              /\ \             __                    /\ \
+\ \ \_\ \   __  __    \_\ \      __   /\_\      __       ___ \ \ \/'\
+ \ \  _  \ /\ \/\ \   /'_` \   /'__`\ \/\ \   /'__`\    /'___\\ \ , <
+  \ \ \ \ \\ \ \_\ \ /\ \L\ \ /\  __/  \ \ \ /\ \L\.\_ /\ \__/ \ \ \\`\
+   \ \_\ \_\\/`____ \\ \___,_\\ \____\ _\ \ \\ \__/.\_\\ \____\ \ \_\ \_\
+    \/_/\/_/ `/___/> \\/__,_ / \/____//\ \_\ \\/__/\/_/ \/____/  \/_/\/_/
+                /\___/                \ \____/
+                \/__/                  \/___/
+
+Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
+-->
+
+
+
+
+
+
+
+
+
+<head>
+  <script data-ad-client="ca-pub-6794902480931711" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><!-- 구글 애드센스.. -->
+  <meta name="naver-site-verification" content="5ed99748eeae22ae60b755d080de65ec0e50cc40" />
+  <!-- =============== -->
+<!-- META            -->
+<!-- =============== -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="format-detection" content="telephone=no">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta property="og:title" content="[NestJs] 파이프와 유효성 검사">
+<meta property="og:type" content="article">
+
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/img/logo.png">
+
+
+<meta property="og:image:width" content="640" />
+<meta property="og:image:height" content="360" />
+
+
+
+  <title>[NestJs] 파이프와 유효성 검사 &middot; Gmin.Y Blog</title>
+
+
+
+<meta name="description" content="
+  1. 파이프
+  2. 파이프의 내부 구현 이해하기
+  3. 유효성 검사 파이프 만들기
+  4. 유저 서비스에 유효성 검사 적용
+    
+      4.1 유저 생성 body 유효성 검사
+      4.2 class-transformer 활용
+      4.3 커스텀 유효성 검사기
+    
+  
+
+
+">
+<meta property="og:description" content="
+  1. 파이프
+  2. 파이프의 내부 구현 이해하기
+  3. 유효성 검사 파이프 만들기
+  4. 유저 서비스에 유효성 검사 적용
+    
+      4.1 유저 생성 body 유효성 검사
+      4.2 class-transformer 활용
+      4.3 커스텀 유효성 검사기
+    
+  
+
+
+">
+
+
+
+<!-- tipuesearch -->
+<link rel="stylesheet" href="/assets/tipuesearch/css/tipuesearch.css">
+
+
+<!-- =============== -->
+<!-- LINKS           -->
+<!-- =============== -->
+<link rel="canonical" href="http://localhost:4000/dev/2024/03/02/08-nest-pipe-validation-check/">
+<meta property="og:url" content="http://localhost:4000/dev/2024/03/02/08-nest-pipe-validation-check/">
+<meta name="google-site-verification" content="g4I-a_du23AFdfLFV2vuKYLo_phz8igXQAF3pHc57wA" />
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N0KPWLFWQ2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-N0KPWLFWQ2');
+</script>
+
+<link rel="alternate" type="application/atom+xml" title="Gmin.Y Blog Feed" href="http://localhost:4000/feed.xml">
+
+
+  <link rel="prev" href="http://localhost:4000/dev/2024/03/02/02-typescript-item2/">
+
+
+
+  <link rel="next" href="http://localhost:4000/dev/2024/03/02/09-nest-database/">
+
+
+<link rel="apple-touch-icon" href="http://localhost:4000/apple-touch-icon.png">
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?">
+<!-- Place favicon.ico in the root directory -->
+
+<!-- =============== -->
+<!-- SCRIPTS         -->
+<!-- =============== -->
+
+<script>
+  !function(n,e){function t(n,e){n.onload=function(){this.onerror=this.onload=null,e(null,n)},n.onerror=function(){this.onerror=this.onload=null,e(new Error("Failed to load "+this.src),n)}}function o(n,e){n.onreadystatechange=function(){"complete"!=this.readyState&&"loaded"!=this.readyState||(this.onreadystatechange=null,e(null,n))}}n._loaded=!1,n.loadJSDeferred=function(a,d){function r(){n._loaded=!0;var r=e.createElement("script");r.src=a,d&&(("onload"in r?t:o)(r,d),r.onload||t(r,d));var l=e.getElementsByTagName("script")[0];l.parentNode.insertBefore(r,l)}n._loaded?r():n.addEventListener?n.addEventListener("load",r,!1):n.attachEvent?n.attachEvent("onload",r):n.onload=r}}(window,document);
+
+  !function(e){"use strict";var n=function(n,t,o){function i(e){if(a.body)return e();setTimeout(function(){i(e)})}function r(){l.addEventListener&&l.removeEventListener("load",r),l.media=o||"all"}var d,a=e.document,l=a.createElement("link");if(t)d=t;else{var f=(a.body||a.getElementsByTagName("head")[0]).childNodes;d=f[f.length-1]}var s=a.styleSheets;l.rel="stylesheet",l.href=n,l.media="only x",i(function(){d.parentNode.insertBefore(l,t?d:d.nextSibling)});var u=function(e){for(var n=l.href,t=s.length;t--;)if(s[t].href===n)return e();setTimeout(function(){u(e)})};return l.addEventListener&&l.addEventListener("load",r),l.onloadcssdefined=u,u(r),l};"undefined"!=typeof exports?exports.loadCSS=n:e.loadCSS=n}("undefined"!=typeof global?global:this);
+
+  !function(t){if(t.loadCSS){var e=loadCSS.relpreload={};if(e.support=function(){try{return t.document.createElement("link").relList.supports("preload")}catch(t){return!1}},e.poly=function(){for(var e=t.document.getElementsByTagName("link"),r=0;r<e.length;r++){var n=e[r];"preload"===n.rel&&"style"===n.getAttribute("as")&&(t.loadCSS(n.href,n,n.getAttribute("media")),n.rel=null)}},!e.support()){e.poly();var r=t.setInterval(e.poly,300);t.addEventListener&&t.addEventListener("load",function(){e.poly(),t.clearInterval(r)}),t.attachEvent&&t.attachEvent("onload",function(){t.clearInterval(r)})}}}(this);
+
+  window.disablePushState = false;
+  window.disableDrawer = false;
+</script>
+
+<!--[if lt IE 9]>
+<script src="https://unpkg.com/html5shiv/dist/html5shiv.min.js"></script>
+<![endif]-->
+
+<!-- =============== -->
+<!-- STYLES          -->
+<!-- =============== -->
+<style>
+  
+  @import url(https://fonts.googleapis.com/earlyaccess/nanumgothic.css);article,aside,dialog,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}mark{background:#FF0;color:#000}*{box-sizing:border-box}html,body{margin:0;padding:0}html{font-size:16px;line-height:1.75}body{color:#333;background-color:#fff;overflow-y:scroll}a{text-decoration:none}.lead{margin-left:-1rem;margin-right:-1rem}img,.img{display:block;max-width:100%;margin-bottom:1rem;border:none}img.lead,.img.lead{max-width:calc(100% + 2rem);width:calc(100% + 2rem)}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6,.heading{font-weight:bold;text-rendering:optimizeLegibility}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6{margin:1.6rem 0 1rem;line-height:1.6}h1,.h1{font-size:2rem;line-height:1.25}h2,.h2{font-size:1.5rem}h3,.h3{font-size:1.17em}p{margin-top:0;margin-bottom:1rem}p.lead{font-size:1.25rem;font-weight:300;padding:0 1rem}ul,ol,dl{margin-top:0;margin-bottom:1rem}ul,ol{padding-left:1.25rem}hr{position:relative;margin:2rem 0 3rem 0;border:0;border-top:1px solid #eee}.hr{padding-bottom:.5rem;border-bottom:1px solid #eee;margin-bottom:1.5rem}h4,h5,h6,.h4,.h5,.h6{margin-bottom:0.5rem;font-size:1rem}table{margin-bottom:1rem;width:100%;width:calc(100% + 2rem);margin-left:-1rem;border:1px solid #e5e5e5;border-collapse:collapse;border-spacing:0}td,th{padding:.25rem .5rem;border:1px solid #e5e5e5}td:first-child,th:first-child{padding-left:1rem}td:last-child,th:last-child{padding-right:1rem}thead+tbody,tbody+tbody,tfoot{border-top:3px double #e5e5e5}tbody tr:nth-child(odd) td,tbody tr:nth-child(odd) th{background-color:#f9f9f9}footer{margin-bottom:2rem}.page,.post{margin-bottom:3em}.page li+li,.post li+li{margin-top:.25rem}.page>header,.post>header{margin-bottom:2rem}.page-title,.post-title{margin-top:0}.post-date{display:block;margin-top:-0.5rem;margin-bottom:1rem;color:#9a9a9a}.related-posts{padding-left:0;list-style:none}.related-posts>li,.related-posts>li+li{margin-top:1rem}.related-posts>li>small,.related-posts>li+li>small{font-size:75%;color:#9a9a9a}.message{margin-bottom:1rem;padding:1rem;color:#787878;background-color:#f9f9f9;margin-left:-1rem;margin-right:-1rem}body,main{position:relative;overflow-x:hidden}@media screen{body::before{content:'';background:#e5e5e5;position:absolute;left:0;top:0;bottom:0}}@media screen and (min-width: 40em){html{font-size:17px}}@media screen and (min-width: 54em){html{font-size:16px}}@media screen and (min-width: 88em){html{font-size:15px}}@media screen and (min-width: 125em){html{font-size:18px}}.sr-only{display:none}.clearfix,.sidebar-social::after,.clearafter::after{content:"";display:table;clear:both}a,.a{position:relative;padding-bottom:.15rem;border-style:hidden}.img{overflow:hidden;background-color:#f9f9f9}.img>img{margin:0;width:100%;height:100%}.sixteen-nine{position:relative}.sixteen-nine::before{display:block;content:"";width:100%;padding-top:56.25%}.sixteen-nine>*{position:absolute;top:0;left:0;right:0;bottom:0}h1+hr,h2+hr,h3+hr,h4+hr,h5+hr,h6+hr{margin-top:0}.fade-in{animation-duration:500ms;animation-name:fade-in;animation-fill-mode:forwards}@keyframes fade-in{from{transform:translateY(-2rem);opacity:0}50%{transform:translateY(-2rem);opacity:0}to{transform:translateY(0);opacity:1}}.mb6{margin-bottom:10rem}.sidebar{color:rgba(255,255,255,0.75);text-align:left}.sidebar::before{content:"";position:absolute;z-index:2;top:0;left:0;bottom:0;right:0;background:linear-gradient(to bottom, rgba(32,32,32,0) 0%, rgba(32,32,32,0.5) 100%)}.sidebar a{color:#fff;border-bottom-color:rgba(255,255,255,0.2);text-shadow:2px 2px 4px rgba(0,0,0,0.5)}.right-side{width:100%;margin-left:auto;margin-right:auto}.right-side .ad-first{text-align:center}@media screen{.right-side{max-width:38rem;min-height:100vh}.right-side .ad-second{display:none}}@media screen and (min-width: 54em){.right-side{margin-left:20rem;margin-right:1rem;padding:4rem 1rem 12rem}.right-side .ad-second{text-align:center;display:block}}@media screen and (min-width: 72em){.right-side{margin-left:22rem;max-width:42rem}}@media screen and (min-width: 88em){.right-side{width:162px;margin-left:0rem;margin-right:0rem;padding:0rem;margin-top:10rem;display:block;float:left}}@media screen and (min-width: 96em){.right-side{width:300px;margin-right:0rem}}#_yDrawer{position:relative}@media screen{#_yDrawer{min-height:640px;min-height:100vh}}@media screen and (min-width: 54em){#_yDrawer{width:18rem;margin-left:0}}.sidebar-bg{position:absolute;height:100%;overflow:hidden;top:0;right:0;bottom:0;left:0;background:#202020 center / cover}.sidebar-box{display:flex;justify-content:center}.sidebar-sticky{position:relative;z-index:3}@media screen{.sidebar-sticky{-ms-overflow-style:none;overflow:-moz-scrollbars-none;height:100%;overflow:auto;position:absolute;padding:3rem 0rem;right:2.5rem;left:2.5rem}}.sidebar-sticky::-webkit-scrollbar{display:none}.sidebar-about>h1{color:#fff;font-size:2rem}.sidebar-nav>ul{list-style:none;padding-left:0;margin-bottom:0.5rem}a.sidebar-nav-item{width:100%;font-weight:normal;display:block;line-height:1.75;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.2)}a.sidebar-nav-subitem{font-weight:normal;display:block;line-height:1.75;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.2)}@media screen{.y-drawer-scrim{z-index:2}.y-drawer-content{width:18rem;left:-18rem;z-index:3}}.sidebar-social{margin-bottom:.5rem}.sidebar-social>ul{list-style:none;padding-left:0;margin:0 -.25rem}.sidebar-social>ul>li{float:left}.sidebar-social>ul>li>a{display:inline-block;text-align:center;font-size:1.6rem;line-height:3rem;width:3.1249rem;height:4rem;padding:.5rem 0}.sidebar-social>ul li+li{margin-top:0}.fixed-top{position:fixed;top:0;left:0;width:100%;z-index:1}.navbar>.content{padding-top:0;padding-bottom:0;min-height:0;height:0}.menu{display:inline-block;padding:1.75rem 1.5rem;border-bottom:none;margin-left:-1.5rem;color:#9a9a9a !important}.menu::after{content:"\2630"}@media screen and (min-width: 54em){.menu{padding:1.25rem 1.5rem;position:absolute;left:-9999px}.menu:focus{position:static}}.animation-main{pointer-events:none}.loading{display:none}@media print{.menu{display:none}}.animation-main{opacity:0;will-change:opacity}.loading{position:absolute;top:0;right:0;padding:5.25rem 4.5rem;transform-origin:top right;transform:scale(0.33)}.content{position:relative;margin-left:auto;margin-right:auto;padding:5rem 1rem 12rem}@media screen{.content{min-height:100vh}}@media screen and (min-width: 54em){.content{padding:4rem 1rem 12rem;margin-left:19rem;margin-right:3rem}}@media screen and (min-width: 72em){.content{max-width:42rem;margin-left:21rem}}@media screen and (min-width: 88em){.content{float:left;width:100%;margin-left:22rem;margin-right:5rem}}@media screen and (min-width: 96em){.content{max-width:60rem}}@media screen and (min-width: 102em){.content{margin-left:25rem;margin-right:8rem}}.me{width:6.5rem;height:6.5rem;align-self:center;margin-right:20px;border-radius:100%;position:relative}@media screen and (min-width: 40em){.me{width:7rem;height:7rem}}@media screen and (min-width: 54em){.me{width:6.5rem;height:6.5rem}}@media screen and (min-width: 72em){.me{width:7rem;height:7rem}}main>footer{width:100%;position:absolute;bottom:0;left:0;right:0;padding:0 1rem;color:#9a9a9a;font-size:smaller;text-align:center}main>footer>p{margin-bottom:0}html{font-family:'Nanum Gothic', 'sans-serif'}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6,.heading{font-family:'Nanum Gothic', 'sans-serif'}
+
+</style>
+<!--[if gt IE 8]>-->
+<style>
+  
+  @import url(https://fonts.googleapis.com/earlyaccess/nanumgothic.css);article,aside,dialog,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}mark{background:#FF0;color:#000}*{box-sizing:border-box}html,body{margin:0;padding:0}html{font-size:16px;line-height:1.75}body{color:#333;background-color:#fff;overflow-y:scroll}a{text-decoration:none}.lead{margin-left:-1rem;margin-right:-1rem}img,.img{display:block;max-width:100%;margin-bottom:1rem;border:none}img.lead,.img.lead{max-width:calc(100% + 2rem);width:calc(100% + 2rem)}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6,.heading{font-weight:bold;text-rendering:optimizeLegibility}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6{margin:1.6rem 0 1rem;line-height:1.6}h1,.h1{font-size:2rem;line-height:1.25}h2,.h2{font-size:1.5rem}h3,.h3{font-size:1.17em}p{margin-top:0;margin-bottom:1rem}p.lead{font-size:1.25rem;font-weight:300;padding:0 1rem}ul,ol,dl{margin-top:0;margin-bottom:1rem}ul,ol{padding-left:1.25rem}hr{position:relative;margin:2rem 0 3rem 0;border:0;border-top:1px solid #eee}.hr{padding-bottom:.5rem;border-bottom:1px solid #eee;margin-bottom:1.5rem}h4,h5,h6,.h4,.h5,.h6{margin-bottom:0.5rem;font-size:1rem}table{margin-bottom:1rem;width:100%;width:calc(100% + 2rem);margin-left:-1rem;border:1px solid #e5e5e5;border-collapse:collapse;border-spacing:0}td,th{padding:.25rem .5rem;border:1px solid #e5e5e5}td:first-child,th:first-child{padding-left:1rem}td:last-child,th:last-child{padding-right:1rem}thead+tbody,tbody+tbody,tfoot{border-top:3px double #e5e5e5}tbody tr:nth-child(odd) td,tbody tr:nth-child(odd) th{background-color:#f9f9f9}footer{margin-bottom:2rem}.page,.post{margin-bottom:3em}.page li+li,.post li+li{margin-top:.25rem}.page>header,.post>header{margin-bottom:2rem}.page-title,.post-title{margin-top:0}.post-date{display:block;margin-top:-0.5rem;margin-bottom:1rem;color:#9a9a9a}.related-posts{padding-left:0;list-style:none}.related-posts>li,.related-posts>li+li{margin-top:1rem}.related-posts>li>small,.related-posts>li+li>small{font-size:75%;color:#9a9a9a}.message{margin-bottom:1rem;padding:1rem;color:#787878;background-color:#f9f9f9;margin-left:-1rem;margin-right:-1rem}body,main{position:relative;overflow-x:hidden}@media screen{body::before{content:'';background:#e5e5e5;position:absolute;left:0;top:0;bottom:0}}@media screen and (min-width: 40em){html{font-size:17px}}@media screen and (min-width: 54em){html{font-size:16px}}@media screen and (min-width: 88em){html{font-size:15px}}@media screen and (min-width: 125em){html{font-size:18px}}.sr-only{display:none}.clearfix,.sidebar-social::after,.clearafter::after{content:"";display:table;clear:both}a,.a{position:relative;padding-bottom:.15rem;border-style:hidden}.img{overflow:hidden;background-color:#f9f9f9}.img>img{margin:0;width:100%;height:100%}.sixteen-nine{position:relative}.sixteen-nine::before{display:block;content:"";width:100%;padding-top:56.25%}.sixteen-nine>*{position:absolute;top:0;left:0;right:0;bottom:0}h1+hr,h2+hr,h3+hr,h4+hr,h5+hr,h6+hr{margin-top:0}.fade-in{animation-duration:500ms;animation-name:fade-in;animation-fill-mode:forwards}@keyframes fade-in{from{transform:translateY(-2rem);opacity:0}50%{transform:translateY(-2rem);opacity:0}to{transform:translateY(0);opacity:1}}.mb6{margin-bottom:10rem}.sidebar{color:rgba(255,255,255,0.75);text-align:left}.sidebar::before{content:"";position:absolute;z-index:2;top:0;left:0;bottom:0;right:0;background:linear-gradient(to bottom, rgba(32,32,32,0) 0%, rgba(32,32,32,0.5) 100%)}.sidebar a{color:#fff;border-bottom-color:rgba(255,255,255,0.2);text-shadow:2px 2px 4px rgba(0,0,0,0.5)}.right-side{width:100%;margin-left:auto;margin-right:auto}.right-side .ad-first{text-align:center}@media screen{.right-side{max-width:38rem;min-height:100vh}.right-side .ad-second{display:none}}@media screen and (min-width: 54em){.right-side{margin-left:20rem;margin-right:1rem;padding:4rem 1rem 12rem}.right-side .ad-second{text-align:center;display:block}}@media screen and (min-width: 72em){.right-side{margin-left:22rem;max-width:42rem}}@media screen and (min-width: 88em){.right-side{width:162px;margin-left:0rem;margin-right:0rem;padding:0rem;margin-top:10rem;display:block;float:left}}@media screen and (min-width: 96em){.right-side{width:300px;margin-right:0rem}}#_yDrawer{position:relative}@media screen{#_yDrawer{min-height:640px;min-height:100vh}}@media screen and (min-width: 54em){#_yDrawer{width:18rem;margin-left:0}}.sidebar-bg{position:absolute;height:100%;overflow:hidden;top:0;right:0;bottom:0;left:0;background:#202020 center / cover}.sidebar-box{display:flex;justify-content:center}.sidebar-sticky{position:relative;z-index:3}@media screen{.sidebar-sticky{-ms-overflow-style:none;overflow:-moz-scrollbars-none;height:100%;overflow:auto;position:absolute;padding:3rem 0rem;right:2.5rem;left:2.5rem}}.sidebar-sticky::-webkit-scrollbar{display:none}.sidebar-about>h1{color:#fff;font-size:2rem}.sidebar-nav>ul{list-style:none;padding-left:0;margin-bottom:0.5rem}a.sidebar-nav-item{width:100%;font-weight:normal;display:block;line-height:1.75;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.2)}a.sidebar-nav-subitem{font-weight:normal;display:block;line-height:1.75;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.2)}@media screen{.y-drawer-scrim{z-index:2}.y-drawer-content{width:18rem;left:-18rem;z-index:3}}.sidebar-social{margin-bottom:.5rem}.sidebar-social>ul{list-style:none;padding-left:0;margin:0 -.25rem}.sidebar-social>ul>li{float:left}.sidebar-social>ul>li>a{display:inline-block;text-align:center;font-size:1.6rem;line-height:3rem;width:3.1249rem;height:4rem;padding:.5rem 0}.sidebar-social>ul li+li{margin-top:0}.fixed-top{position:fixed;top:0;left:0;width:100%;z-index:1}.navbar>.content{padding-top:0;padding-bottom:0;min-height:0;height:0}.menu{display:inline-block;padding:1.75rem 1.5rem;border-bottom:none;margin-left:-1.5rem;color:#9a9a9a !important}.menu::after{content:"\2630"}@media screen and (min-width: 54em){.menu{padding:1.25rem 1.5rem;position:absolute;left:-9999px}.menu:focus{position:static}}.animation-main{pointer-events:none}.loading{display:none}@media print{.menu{display:none}}.animation-main{opacity:0;will-change:opacity}.loading{position:absolute;top:0;right:0;padding:5.25rem 4.5rem;transform-origin:top right;transform:scale(0.33)}.content{position:relative;margin-left:auto;margin-right:auto;padding:5rem 1rem 12rem}@media screen{.content{min-height:100vh}}@media screen and (min-width: 54em){.content{padding:4rem 1rem 12rem;margin-left:19rem;margin-right:3rem}}@media screen and (min-width: 72em){.content{max-width:42rem;margin-left:21rem}}@media screen and (min-width: 88em){.content{float:left;width:100%;margin-left:22rem;margin-right:5rem}}@media screen and (min-width: 96em){.content{max-width:60rem}}@media screen and (min-width: 102em){.content{margin-left:25rem;margin-right:8rem}}.me{width:6.5rem;height:6.5rem;align-self:center;margin-right:20px;border-radius:100%;position:relative}@media screen and (min-width: 40em){.me{width:7rem;height:7rem}}@media screen and (min-width: 54em){.me{width:6.5rem;height:6.5rem}}@media screen and (min-width: 72em){.me{width:7rem;height:7rem}}main>footer{width:100%;position:absolute;bottom:0;left:0;right:0;padding:0 1rem;color:#9a9a9a;font-size:smaller;text-align:center}main>footer>p{margin-bottom:0}html{font-family:'Nanum Gothic', 'sans-serif'}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6,.heading{font-family:'Nanum Gothic', 'sans-serif'}
+
+</style>
+
+
+<link rel="preload" href="http://localhost:4000/assets/css/hydejack.css?v=6.4.0" as="style" onload="this.rel='stylesheet'">
+
+<style id="_pageStyle">
+
+.content a{color:#4f86aa;border-color:rgba(79,134,170,0.2)}.content a:hover{border-color:#4f86aa}:focus{outline-color:#4f86aa}::selection{color:#fff;background:#4f86aa}::-moz-selection{color:#fff;background:#4f86aa}
+
+</style>
+
+
+<noscript>
+  <link rel="stylesheet" href="http://localhost:4000/assets/css/hydejack.css?v=6.4.0">
+  
+  
+  
+
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <style>
+      html { font-family: 'Noto Sans KR', 'sans-serif' }
+      h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, .heading { font-family: 'Noto Sans KR', 'sans-serif' }
+    </style>
+  
+
+  
+  <link rel="stylesheet" href="http://localhost:4000/assets/icomoon/style.css">
+</noscript>
+<!--<![endif]-->
+
+</head>
+
+<body>
+  <!-- =============== -->
+<!-- MENU            -->
+<!-- =============== -->
+<div class="navbar fixed-top">
+  <div class="content">
+    <span class="sr-only">Jump to:</span>
+    <a id="_menu" class="menu no-hover" href="#_title">
+      <span class="sr-only">Menu</span>
+    </a>
+  </div>
+</div>
+
+<!-- =============== -->
+<!-- CONTENT         -->
+<!-- =============== -->
+<div id="_yPushState">
+  <div class="fade-in">
+    <main id="_main" class="content" role="main" data-color="#4f86aa" data-image="/assets/img/main-left.jpeg">
+      <!--<div style="text-align: center;">&lt;!&ndash; 조회수 노출 HITS &ndash;&gt;
+        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/03/02/08-nest-pipe-validation-check/"
+           target="_blank">
+          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/03/02/08-nest-pipe-validation-check/.svg" /></a>
+      </div>-->
+      
+
+<article id="post-dev/2024/03/02/08-nest-pipe-validation-check" class="post" role="article">
+  <header>
+    <h1 class="post-title">
+      
+        [NestJs] 파이프와 유효성 검사
+      
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-02T00:00:00+09:00">2024-03-02</time>
+      
+
+
+
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
+    
+  <div class="hr" style="padding-bottom:0"></div>
+
+
+  </header>
+  
+
+  
+    <div class="markdown-body">
+
+
+<br/>
+      <ul>
+  <li><a href="#1-파이프">1. 파이프</a></li>
+  <li><a href="#2-파이프의-내부-구현-이해하기">2. 파이프의 내부 구현 이해하기</a></li>
+  <li><a href="#3-유효성-검사-파이프-만들기">3. 유효성 검사 파이프 만들기</a></li>
+  <li><a href="#4-유저-서비스에-유효성-검사-적용">4. 유저 서비스에 유효성 검사 적용</a>
+    <ul>
+      <li><a href="#41-유저-생성-body-유효성-검사">4.1 유저 생성 body 유효성 검사</a></li>
+      <li><a href="#42-class-transformer-활용">4.2 class-transformer 활용</a></li>
+      <li><a href="#43-커스텀-유효성-검사기">4.3 커스텀 유효성 검사기</a></li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<hr />
+
+<h1 id="1-파이프">1. 파이프</h1>
+
+<p>파이프는 요청이 라우터 핸들러로 전달되기 전에 요청 객체를 변환하거나 검사할 수 있게 한다. 미들웨어와 비슷하지만 파이프는 모든 context에서 사용할 수 있다.
+@nest/common 패키지에는 여러 내장 파이프가 있다.</p>
+
+<ul>
+  <li>ValidationPipe</li>
+  <li>ParseIntPipe</li>
+  <li>ParseBoolPipe</li>
+  <li>ParseArrayPipe</li>
+  <li>ParseUUIDPipe</li>
+  <li>DefaultValuePipe</li>
+</ul>
+
+<p>예를 들어 /users/user/:id 엔드포인트에 전달된 id는 문자열 타입이다. 코드에서는 이를 정수로 사용할때 @Param 데커레이터를 통해 실행 context에 바인딩할 수 있다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Get</span><span class="p">(</span><span class="dl">'</span><span class="s1">:id</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">findOne</span><span class="p">(@</span><span class="nd">Param</span><span class="p">(</span><span class="dl">'</span><span class="s1">id</span><span class="dl">'</span><span class="p">,</span> <span class="nx">ParseIntPipe</span><span class="p">)</span> <span class="nx">id</span><span class="p">:</span> <span class="nx">number</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">userService</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>** id 에 정수 파싱이 안되는 문자를 전달하면 400 에러가 발생한다. **</p>
+
+<p>클래스를 전달하지 않고 파이프 객체를 직접 생성해서 전달할 수 있다. 예를 들어 에러에서 상태코드를 변경하고자 할때 사용할 수 있다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Get</span><span class="p">(</span><span class="dl">'</span><span class="s1">:id</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">findOne</span><span class="p">(@</span><span class="nd">Param</span><span class="p">(</span><span class="dl">'</span><span class="s1">id</span><span class="dl">'</span><span class="p">,</span> <span class="k">new</span> <span class="nx">ParseIntPipe</span><span class="p">({</span> <span class="na">errorHttpStatusCode</span><span class="p">:</span> <span class="nx">HttpStatus</span><span class="p">.</span><span class="nx">NOT_ACCEPTABLE</span> <span class="p">}))</span> <span class="nx">id</span><span class="p">:</span> <span class="nx">number</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">userService</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>DefaultValuePipe는 인수에 기본값을 설정할 때 사용한다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Get</span><span class="p">()</span>
+<span class="nx">findAll</span><span class="p">(</span>
+  <span class="p">@</span><span class="nd">Query</span><span class="p">(</span><span class="dl">'</span><span class="s1">offset</span><span class="dl">'</span><span class="p">,</span> <span class="k">new</span> <span class="nx">DefaultValuePipe</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="nx">ParseIntPipe</span><span class="p">)</span> <span class="nx">offset</span><span class="p">:</span> <span class="nx">number</span><span class="p">,</span>
+  <span class="p">@</span><span class="nd">Query</span><span class="p">(</span><span class="dl">'</span><span class="s1">limit</span><span class="dl">'</span><span class="p">,</span> <span class="k">new</span> <span class="nx">DefaultValuePipe</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nx">ParseIntPipe</span><span class="p">)</span> <span class="nx">limit</span><span class="p">:</span> <span class="nx">number</span><span class="p">,</span>
+<span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">offset</span><span class="p">,</span> <span class="nx">limit</span><span class="p">);</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">userService</span><span class="p">.</span><span class="nx">findAll</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="2-파이프의-내부-구현-이해하기">2. 파이프의 내부 구현 이해하기</h1>
+
+<p>Nest에서 ValidationPipe를 제공하지만 여기서 ValidationPipe를 직접 만들어본다.
+커스텀 파이프는 PipeTransform 인터페이스를 상속받은 클래스에 @Injectable 데코레이터를 붙여준다.</p>
+
+<ul>
+  <li>validation.pipe.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">PipeTransform</span><span class="p">,</span> <span class="nx">Injectable</span><span class="p">,</span> <span class="nx">ArgumentMetadata</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Injectable</span><span class="p">()</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">ValidationPipe</span> <span class="kr">implements</span> <span class="nx">PipeTransform</span> <span class="p">{</span>
+  <span class="nx">transform</span><span class="p">(</span><span class="nx">value</span><span class="p">:</span> <span class="nx">any</span><span class="p">,</span> <span class="nx">metadata</span><span class="p">:</span> <span class="nx">ArgumentMetadata</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">metadata</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>value: 현재 파이프에 전달된 인수</li>
+  <li>metadata: 현재 파이프에 전달된 인수의 메타데이터</li>
+</ul>
+
+<p>ArgumentMetadata 시그니처</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="kr">interface</span> <span class="nx">ArgumentMetadata</span> <span class="p">{</span>
+    <span class="cm">/**
+     * Indicates whether argument is a body, query, param, or custom parameter
+     */</span>
+    <span class="nx">readonly</span> <span class="nx">type</span><span class="p">:</span> <span class="nx">Paramtype</span><span class="p">;</span>
+    <span class="cm">/**
+     * Underlying base type (e.g., `String`) of the parameter, based on the type
+     * definition in the route handler.
+     */</span>
+    <span class="nx">readonly</span> <span class="nx">metatype</span><span class="p">?:</span> <span class="nx">Type</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span> <span class="o">|</span> <span class="kc">undefined</span><span class="p">;</span>
+    <span class="cm">/**
+     * String passed as an argument to the decorator.
+     * Example: `@Body('userId')` would yield `userId`
+     */</span>
+    <span class="nx">readonly</span> <span class="nx">data</span><span class="p">?:</span> <span class="nx">string</span> <span class="o">|</span> <span class="kc">undefined</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>type: 파이프에 전달된 인수가 본문인지 쿼리 매개변수인지, 경로 매개변수인지 커스텀 매개변수인지 나타낸다.</li>
+  <li>metadata: 라우트 핸들러에 정의된 인수의 타입을 알려준다.</li>
+  <li>data: 데커레이터에 전달된 문자열, 즉, 매개변수의 이름이다.</li>
+</ul>
+
+<p>예를 들어 아래 라우터 핸들러를 구현했다면, transform 함수에 전달되는 인수는 다음과 같은 객체가 된다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Get</span><span class="p">(</span><span class="dl">'</span><span class="s1">:id</span><span class="dl">'</span><span class="p">)</span>
+<span class="nx">findOne</span><span class="p">(@</span><span class="nd">Param</span><span class="p">(</span><span class="dl">'</span><span class="s1">id</span><span class="dl">'</span><span class="p">,</span> <span class="nx">ValidationPipe</span><span class="p">)</span> <span class="nx">id</span><span class="p">:</span> <span class="nx">number</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">userService</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{ metadata: [Function: Number], type: 'param', data: 'id' }
+</code></pre></div></div>
+
+<h1 id="3-유효성-검사-파이프-만들기">3. 유효성 검사 파이프 만들기</h1>
+
+<p>Nest 공식 문서에는 @UsePipes와 joi 를 이용하여 커스텀 파이프를 바인딩하는 방법을 설명한다. joi는 널리 사용되지만 class-validator와 비교하면 문법이 번거롭다. class-validator를 이용하여 유효성 검사 파이프를 구현해보자.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm i <span class="nt">--save</span> class-validator class-transformer
+</code></pre></div></div>
+
+<ul>
+  <li>dto/create-user.dto</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">IsEmail</span><span class="p">,</span> <span class="nx">IsString</span><span class="p">,</span> <span class="nx">MaxLength</span><span class="p">,</span> <span class="nx">MinLength</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">class-validator</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CreateUserDto</span> <span class="p">{</span>
+  <span class="p">@</span><span class="nd">IsString</span><span class="p">()</span>
+  <span class="p">@</span><span class="nd">MinLength</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="p">@</span><span class="nd">MaxLength</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+  <span class="nx">readonly</span> <span class="nx">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+
+  <span class="p">@</span><span class="nd">IsEmail</span><span class="p">()</span>
+  <span class="nx">email</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>위에서 정의한 dto 객체를 받아서 유효성 검사를 하는 파이프(ValidationPipe)를 직접 구현해보자.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span>
+  <span class="nx">ArgumentMetadata</span><span class="p">,</span>
+  <span class="nx">BadRequestException</span><span class="p">,</span>
+  <span class="nx">Injectable</span><span class="p">,</span>
+  <span class="nx">PipeTransform</span><span class="p">,</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/common</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">validate</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">class-validator</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">plainToClass</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">class-transformer</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Injectable</span><span class="p">()</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">ValidationPipe</span> <span class="kr">implements</span> <span class="nx">PipeTransform</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">async</span> <span class="nx">transform</span><span class="p">(</span><span class="na">value</span><span class="p">:</span> <span class="nx">any</span><span class="p">,</span> <span class="p">{</span> <span class="nx">metatype</span> <span class="p">}:</span> <span class="nx">ArgumentMetadata</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// metatype 이 지원하는 타입인지 검사</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">metatype</span> <span class="o">||</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">toValidate</span><span class="p">(</span><span class="nx">metatype</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// 순수 자바스크립트 객체를 클래스의 객체로 변환, class-validator의 유효성 검사는 타입이 필요하므로 타입 지정 과정을 plainToClass로 수행한다.</span>
+    <span class="kd">const</span> <span class="nx">object</span> <span class="o">=</span> <span class="nx">plainToClass</span><span class="p">(</span><span class="nx">metatype</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+
+    <span class="kd">const</span> <span class="nx">errors</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">validate</span><span class="p">(</span><span class="nx">object</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">errors</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="nx">BadRequestException</span><span class="p">(</span><span class="dl">'</span><span class="s1">Validation failed~</span><span class="dl">'</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kr">private</span> <span class="nx">toValidate</span><span class="p">(</span><span class="na">metatype</span><span class="p">:</span> <span class="nb">Function</span><span class="p">):</span> <span class="nx">boolean</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="na">types</span><span class="p">:</span> <span class="nb">Function</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">String</span><span class="p">,</span> <span class="nb">Boolean</span><span class="p">,</span> <span class="nb">Number</span><span class="p">,</span> <span class="nb">Array</span><span class="p">,</span> <span class="nb">Object</span><span class="p">];</span>
+    <span class="k">return</span> <span class="o">!</span><span class="nx">types</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">metatype</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>ValidationPipe 적용</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Post</span><span class="p">()</span>
+<span class="nx">create</span><span class="p">(@</span><span class="nd">Body</span><span class="p">(</span><span class="nx">ValidationPipe</span><span class="p">)</span> <span class="nx">createUserDto</span><span class="p">:</span> <span class="nx">CreateUserDto</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">userService</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">createUserDto</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>잘못된 데이터 전달하면 에러가 발생한다.</p>
+
+<pre><code class="language-jso">{
+  "statusCode": 400,
+  "message": "Validation failed",
+  "error": "Bad Request"
+}
+</code></pre>
+
+<p>ValidationPipe를 전역 설정하기 위해서는 bootstrap에서 적용하면 된다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">NestFactory</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/core</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">AppModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./app.module</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">ValidationPipe</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./validation.pipe</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">bootstrap</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">NestFactory</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">AppModule</span><span class="p">);</span>
+  <span class="nx">app</span><span class="p">.</span><span class="nx">useGlobalPipes</span><span class="p">(</span><span class="k">new</span> <span class="nx">ValidationPipe</span><span class="p">());</span>
+  <span class="k">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">3000</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nx">bootstrap</span><span class="p">();</span>
+</code></pre></div></div>
+
+<h1 id="4-유저-서비스에-유효성-검사-적용">4. 유저 서비스에 유효성 검사 적용</h1>
+
+<h2 id="41-유저-생성-body-유효성-검사">4.1 유저 생성 body 유효성 검사</h2>
+
+<p>Nest 에서 제공하는 ValidationPipe를 전역으로 적용한다. 이때 class-tranformer를 적용하기 위해 transform 속성을 true로 설정한다.</p>
+
+<ul>
+  <li>main.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">NestFactory</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/core</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">AppModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./app.module</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">ValidationPipe</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">bootstrap</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">NestFactory</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">AppModule</span><span class="p">);</span>
+  <span class="nx">app</span><span class="p">.</span><span class="nx">useGlobalPipes</span><span class="p">(</span><span class="k">new</span> <span class="nx">ValidationPipe</span><span class="p">({</span> <span class="na">transform</span><span class="p">:</span> <span class="kc">true</span> <span class="p">}));</span>
+  <span class="k">await</span> <span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">3000</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nx">bootstrap</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>DTO를 수정한다.</p>
+
+<ul>
+  <li>create-user.dto.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span>
+  <span class="nx">IsEmail</span><span class="p">,</span>
+  <span class="nx">IsString</span><span class="p">,</span>
+  <span class="nx">Matches</span><span class="p">,</span>
+  <span class="nx">MaxLength</span><span class="p">,</span>
+  <span class="nx">MinLength</span><span class="p">,</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">class-validator</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CreateUserDto</span> <span class="p">{</span>
+  <span class="p">@</span><span class="nd">IsString</span><span class="p">()</span>
+  <span class="p">@</span><span class="nd">MinLength</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="p">@</span><span class="nd">MaxLength</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+  <span class="nx">readonly</span> <span class="nx">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+
+  <span class="p">@</span><span class="nd">IsString</span><span class="p">()</span>
+  <span class="p">@</span><span class="nd">IsEmail</span><span class="p">()</span>
+  <span class="p">@</span><span class="nd">MaxLength</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+  <span class="nx">readonly</span> <span class="nx">email</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+
+  <span class="p">@</span><span class="nd">IsString</span><span class="p">()</span>
+  <span class="p">@</span><span class="nd">Matches</span><span class="p">(</span><span class="sr">/^</span><span class="se">[</span><span class="sr">A-Za-z</span><span class="se">\d</span><span class="sr">!@#$%^&amp;*()</span><span class="se">]{8,30}</span><span class="sr">$/</span><span class="p">)</span>
+  <span class="nx">readonly</span> <span class="nx">password</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="42-class-transformer-활용">4.2 class-transformer 활용</h2>
+
+<p>@Transform 데커레이터는 transformFn를 인수로 받는다. transformFn은 value와 obj 등을 인수로 받아 속성을 변형한 후 리턴하는 함수이다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="nx">declare</span> <span class="kd">function</span> <span class="nx">Transform</span><span class="p">(</span><span class="nx">transformFn</span><span class="p">:</span> <span class="p">(</span><span class="nx">params</span><span class="p">:</span> <span class="nx">TransformFnParams</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">any</span><span class="p">,</span> <span class="nx">options</span><span class="p">?:</span> <span class="nx">TransformOptions</span><span class="p">):</span> <span class="nx">PropertyDecorator</span><span class="p">;</span>
+
+
+<span class="k">export</span> <span class="kr">interface</span> <span class="nx">TransformFnParams</span> <span class="p">{</span>
+  <span class="nl">value</span><span class="p">:</span> <span class="nx">any</span><span class="p">;</span>
+  <span class="nl">key</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="nl">obj</span><span class="p">:</span> <span class="nx">any</span><span class="p">;</span>
+  <span class="nl">type</span><span class="p">:</span> <span class="nx">TransformationType</span><span class="p">;</span>
+  <span class="nl">options</span><span class="p">:</span> <span class="nx">ClassTransformOptions</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>name 속성에 @Transform 적용하여 값을 확인해보자.</p>
+
+<ul>
+  <li>create-user.dto.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Transform</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">class-transformer</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span>
+  <span class="nx">IsEmail</span><span class="p">,</span>
+  <span class="nx">IsString</span><span class="p">,</span>
+  <span class="nx">Matches</span><span class="p">,</span>
+  <span class="nx">MaxLength</span><span class="p">,</span>
+  <span class="nx">MinLength</span><span class="p">,</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">class-validator</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CreateUserDto</span> <span class="p">{</span>
+  <span class="p">@</span><span class="nd">Transform</span><span class="p">((</span><span class="nx">params</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">params</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+  <span class="p">})</span>
+  <span class="p">@</span><span class="nd">IsString</span><span class="p">()</span>
+  <span class="p">@</span><span class="nd">MinLength</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="p">@</span><span class="nd">MaxLength</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+  <span class="nx">readonly</span> <span class="nx">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+
+  <span class="p">...</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+  value: 'ga',
+  key: 'name',
+  obj: { name: 'ga', email: 'gmini.y@gmail.com', password: 'pasdfqwer' },
+  type: 0,
+  options: {
+    enableCircularCheck: false,
+    enableImplicitConversion: false,
+    excludeExtraneousValues: false,
+    excludePrefixes: undefined,
+    exposeDefaultValues: false,
+    exposeUnsetFields: true,
+    groups: undefined,
+    ignoreDecorators: false,
+    strategy: undefined,
+    targetMaps: undefined,
+    version: undefined
+  }
+}
+</code></pre></div></div>
+
+<p>name에 앞뒤 공백을 제거하는 로직을 추가하자.</p>
+
+<ul>
+  <li>create-user.dto.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CreateUserDto</span> <span class="p">{</span>
+  <span class="p">@</span><span class="nd">Transform</span><span class="p">((</span><span class="nx">params</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">trim</span><span class="p">())</span>
+  <span class="p">@</span><span class="nd">IsString</span><span class="p">()</span>
+  <span class="p">@</span><span class="nd">MinLength</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="p">@</span><span class="nd">MaxLength</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+  <span class="nx">readonly</span> <span class="nx">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+
+<span class="p">...</span>
+</code></pre></div></div>
+
+<p>TransformFnParams의 obj는 CreateUserDto 객체를 갖는다. 이를 통해 password는 name과 동일한 문자열을 포함할 수 없도록 구현할 수 있다.</p>
+
+<p>@ create-user.dto.ts</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CreateUserDto</span> <span class="p">{</span>
+  <span class="p">...</span>
+  <span class="p">@</span><span class="nd">Transform</span><span class="p">(({</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">obj</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">password</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">trim</span><span class="p">()))</span> <span class="p">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="nx">BadRequestException</span><span class="p">(</span><span class="dl">'</span><span class="s1">password can not include string of name</span><span class="dl">'</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">value</span><span class="p">.</span><span class="nx">trim</span><span class="p">();</span>
+  <span class="p">})</span>
+  <span class="p">@</span><span class="nd">IsString</span><span class="p">()</span>
+  <span class="p">@</span><span class="nd">Matches</span><span class="p">(</span><span class="sr">/^</span><span class="se">[</span><span class="sr">A-Za-z</span><span class="se">\d</span><span class="sr">!@#$%^&amp;*()</span><span class="se">]{8,30}</span><span class="sr">$/</span><span class="p">)</span>
+  <span class="nx">readonly</span> <span class="nx">password</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<h2 id="43-커스텀-유효성-검사기">4.3 커스텀 유효성 검사기</h2>
+
+<p>직접 필요한 유효성 검사를 수행하는 데커레이터를 만들어서 활용할 수 있다.</p>
+
+<ul>
+  <li>not-in.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span>
+  <span class="nx">ValidationOptions</span><span class="p">,</span>
+  <span class="nx">registerDecorator</span><span class="p">,</span>
+  <span class="nx">ValidationArguments</span><span class="p">,</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">class-validator</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="c1">// 데커레이터 인수는 참조하고자 하는 다른 속성의 이름과 ValidationOptions를 받는다.</span>
+<span class="k">export</span> <span class="kd">function</span> <span class="nx">NotIn</span><span class="p">(</span><span class="nx">property</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">validationOptions</span><span class="p">?:</span> <span class="nx">ValidationOptions</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// registerDecorator를 호출하는 함수를 리턴한다.</span>
+  <span class="c1">// eslint-disable-next-line @typescript-eslint/ban-types</span>
+  <span class="k">return</span> <span class="p">(</span><span class="nx">object</span><span class="p">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nx">propertyName</span><span class="p">:</span> <span class="nx">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="c1">// registerDecorator 함수는 ValidationDecoratorOptions 객체를 인수로 받는다.</span>
+    <span class="nx">registerDecorator</span><span class="p">({</span>
+      <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">NotIn</span><span class="dl">'</span><span class="p">,</span> <span class="c1">// 데커레이터 이름</span>
+      <span class="na">target</span><span class="p">:</span> <span class="nx">object</span><span class="p">.</span><span class="kd">constructor</span><span class="p">,</span> <span class="c1">// 객체 생성 시 적용</span>
+      <span class="nx">propertyName</span><span class="p">,</span>
+      <span class="na">options</span><span class="p">:</span> <span class="nx">validationOptions</span><span class="p">,</span> <span class="c1">// 데커레이터 인수로 받은 옵션을 적용한다.</span>
+      <span class="na">constraints</span><span class="p">:</span> <span class="p">[</span><span class="nx">property</span><span class="p">],</span> <span class="c1">// 속성에 적용되도록 제약을 준다.</span>
+      <span class="na">validator</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1">// 유효성 검사 규칙이 기술된다.</span>
+        <span class="nx">validate</span><span class="p">(</span><span class="na">value</span><span class="p">:</span> <span class="nx">any</span><span class="p">,</span> <span class="na">args</span><span class="p">:</span> <span class="nx">ValidationArguments</span><span class="p">)</span> <span class="p">{</span>
+          <span class="kd">const</span> <span class="p">[</span><span class="nx">relatedPropertyName</span><span class="p">]</span> <span class="o">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">constraints</span><span class="p">;</span>
+          <span class="kd">const</span> <span class="nx">relatedValue</span> <span class="o">=</span> <span class="p">(</span><span class="nx">args</span><span class="p">.</span><span class="nx">object</span> <span class="k">as</span> <span class="nx">any</span><span class="p">)[</span><span class="nx">relatedPropertyName</span><span class="p">];</span>
+
+          <span class="k">return</span> <span class="p">(</span>
+            <span class="k">typeof</span> <span class="nx">value</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">string</span><span class="dl">'</span> <span class="o">&amp;&amp;</span>
+            <span class="k">typeof</span> <span class="nx">relatedValue</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">string</span><span class="dl">'</span> <span class="o">&amp;&amp;</span>
+            <span class="o">!</span><span class="nx">relatedValue</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span>
+          <span class="p">);</span>
+        <span class="p">},</span>
+      <span class="p">},</span>
+    <span class="p">});</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>create-user.dto.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">NotIn</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./not-in</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">CreateUserDto</span> <span class="p">{</span>
+  <span class="p">@</span><span class="nd">Transform</span><span class="p">((</span><span class="nx">params</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">params</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">trim</span><span class="p">())</span>
+  <span class="p">@</span><span class="nd">NotIn</span><span class="p">(</span><span class="dl">'</span><span class="s1">password</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">message</span><span class="p">:</span> <span class="dl">'</span><span class="s1">password can not include name</span><span class="dl">'</span> <span class="p">})</span>
+  <span class="p">@</span><span class="nd">IsString</span><span class="p">()</span>
+  <span class="p">@</span><span class="nd">MinLength</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="p">@</span><span class="nd">MaxLength</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+  <span class="nx">readonly</span> <span class="nx">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<hr />
+
+<p><em>본 포스트는 한용재 저자의 <strong>NestJS로 배우는 백엔드 프로그래밍</strong>을 기반으로 스터디하며 정리한 내용들입니다.</em></p>
+
+<ul>
+  <li><a href="http://www.yes24.com/Product/Goods/115850682">NestJS로 배우는 백엔드 프로그래밍</a></li>
+</ul>
+
+      <br/>
+      <br/>
+    </div>
+    <script>
+
+    </script>
+  
+
+</article>
+
+  <hr class="dingbat" />
+
+  <div class="share">
+      <h2>Share this post</h2>
+      <div class="share-body">
+        <a href="http://twitter.com/share?text=[NestJs] 파이프와 유효성 검사&amp;url=http://localhost:4000/dev/2024/03/02/08-nest-pipe-validation-check/"
+    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <span class="icon-twitter">
+            </span>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/03/02/08-nest-pipe-validation-check/"
+    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="icon-facebook">
+            </span>
+        </a>
+    </div>
+  </div>
+  <br/>
+
+
+
+
+
+
+  <aside class="author" role="complementary">
+    <div class="author">
+  <h2 class="page-title hr">
+    About
+  </h2>
+<div class="author-body">
+  
+    
+  
+
+  
+
+  <img
+    src="/assets/img/me.jpg"
+    class="me"
+    alt="gmin"
+    srcset="/assets/img/me.jpg 1x,/assets/img/me.jpg 2x"
+    
+  />
+
+
+  
+  <div class="author-body-description">
+    <p>기술을 통해 사람을 돕고 세상을 이롭게 하는 삶을 지향합니다.</p>
+
+  </div>
+</div>
+</div>
+
+  </aside>
+
+
+
+
+
+<aside class="related" role="complementary">
+  <h2 class="hr">Related Posts</h2>
+
+  <ul class="related-posts">
+    
+      
+      
+      
+        
+        
+          
+
+
+<li class="h4">
+  <a href="/dev/2024/03/04/18-nest-clean-architecture/" data-flip="title">
+    <span>[NestJs] 클린 아키텍처</span>
+  </a>
+  <small><time datetime="2024-03-04T00:00:00+09:00">
+    2024-03-04
+  </time></small>
+</li>
+
+        
+      
+        
+        
+          
+
+
+<li class="h4">
+  <a href="/dev/2024/03/03/17-nest-cqrs/" data-flip="title">
+    <span>[NestJs] CQRS</span>
+  </a>
+  <small><time datetime="2024-03-03T00:00:00+09:00">
+    2024-03-03
+  </time></small>
+</li>
+
+        
+      
+        
+        
+          
+
+
+<li class="h4">
+  <a href="/dev/2024/03/03/16-nest-cron/" data-flip="title">
+    <span>[NestJs] 태스크 스케줄링</span>
+  </a>
+  <small><time datetime="2024-03-03T00:00:00+09:00">
+    2024-03-03
+  </time></small>
+</li>
+
+        
+      
+        
+        
+      
+    
+  </ul>
+</aside>
+
+
+
+      <footer>
+  <hr />
+   <p>© 2024.02. by Gmin.Y</p>
+ 
+  <p>
+    <code>Powered by <a href="https://gminiy.github.io/">gminiy</a></code>
+  </p>
+</footer>
+
+    </main>
+    <div class="right-side">
+<br/>
+  <div class="ad-second">
+  </div>
+</div>
+
+  </div>
+  <div id="_yDrawer">
+  <div id="_sidebar" class="sidebar">
+    <div class="sidebar-bg" style="background-color:#4f86aa;background-image:url(/assets/img/main-left.jpeg)"></div>
+    <header class="sidebar-sticky" role="banner">
+      <br/>
+      <div class="sidebar-about">
+        <h1><a id="_title" href="/">Gmin.Y Blog</a></h1>
+        <p>세상을 이롭게 하는 기술</p>
+
+      </div>
+
+      <br/>
+      <br/>
+      <nav class="sidebar-nav heading" role="navigation">
+        <span class="sr-only">Navigation:</span>
+<ul>
+  
+
+  
+
+  
+  
+  
+  
+  
+    <li>
+      <input type="checkbox" id="list-item-1"/>
+      <div  class="list-wrapper">
+      <a class="sidebar-nav-item" href="/category/dev/">DEV</a>
+       <label class="folder" for="list-item-1">▾</label>
+    </div>
+    <div>
+     <ul class="list-body">
+       
+           
+             <li>
+               <a class="sidebar-nav-subitem" href="/tag/dev-nestjs/">NestJs</a>
+             </li>
+           
+         
+           
+             <li>
+               <a class="sidebar-nav-subitem" href="/tag/dev-typescript/">TypeScript</a>
+             </li>
+           
+         
+     </ul>
+    </div>
+    </li>
+
+  
+  
+    <li>
+      <input type="checkbox" id="list-item-2"/>
+      <div  class="list-wrapper">
+      <a class="sidebar-nav-item" href="/about/">About</a>
+       
+    </div>
+    <div>
+     <ul class="list-body">
+       
+           
+         
+           
+         
+     </ul>
+    </div>
+    </li>
+
+  
+</ul>
+
+      </nav>
+    <br/>
+
+    <form action="/search">
+      <div class="tipue_search_left">
+        <img src="/assets/tipuesearch/search.png" class="tipue_search_icon">
+      </div>
+      <div class="tipue_search_right">
+        <input type="text" name="q" id="tipue_search_input" pattern=".{1,}" title="At least 1 characters" required></div>
+      <div style="clear: both;"></div>
+    </form>
+
+    <br/>
+      <div class="sidebar-box">
+        
+          
+  
+
+  
+
+  <img
+    src="/assets/img/me.jpg"
+    class="me"
+    alt="gmin"
+    srcset="/assets/img/me.jpg 1x,/assets/img/me.jpg 2x"
+    
+  />
+
+
+        
+      </div>
+      
+
+      
+      
+        <div class="sidebar-social">
+          <span class="sr-only">Social:</span>
+<ul>
+  
+    
+
+
+
+
+
+
+
+
+
+<li>
+  <a href="https://instagram.com/gmin_87">
+    <span class="icon-instagram" title="Instagram"></span>
+    <span class="sr-only">Instagram</span>
+  </a>
+</li>
+
+  
+    
+
+
+
+
+
+
+
+
+
+<li>
+  <a href="https://github.com/gminiy">
+    <span class="icon-github" title="GitHub"></span>
+    <span class="sr-only">GitHub</span>
+  </a>
+</li>
+
+  
+    
+
+
+
+
+
+
+
+
+
+<li>
+  <a href="mailto:gmini.y@gmail.com">
+    <span class="icon-mail" title="Email"></span>
+    <span class="sr-only">Email</span>
+  </a>
+</li>
+
+  
+</ul>
+
+        </div>
+      
+    </header>
+  </div>
+</div>
+
+</div>
+
+<!-- =============== -->
+<!-- SCRIPTS         -->
+<!-- =============== -->
+
+<script>
+  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+  ga('create', 'UA-176737306-1', 'auto');
+  ga('send', 'pageview');
+  loadJSDeferred('https://www.google-analytics.com/analytics.js');
+</script>
+
+
+
+
+
+<!--[if gt IE 8]><!---->
+<script src="//ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+<script>
+  WebFont.load({
+    
+    google: {
+      families: 'Lato'.split('|')
+    },
+    
+
+    custom: {
+      families: ['icomoon'],
+      urls: ['/assets/icomoon/style.css']
+    }
+  });
+</script>
+<!--<![endif]-->
+
+
+  <!--[if gt IE 9]>-->
+  <script>loadJSDeferred('');</script>
+
+  
+  <!--<![endif]-->
+
+
+
+</body>
+
+</html>

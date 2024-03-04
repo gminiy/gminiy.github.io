@@ -35,7 +35,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="format-detection" content="telephone=no">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
-<meta property="og:title" content="NestJs">
+<meta property="og:title" content="[NestJs] 헬스 체크">
 <meta property="og:type" content="article">
 
 
@@ -49,13 +49,25 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 
 
 
-  <title>NestJs &middot; Gmin.Y Blog</title>
+  <title>[NestJs] 헬스 체크 &middot; Gmin.Y Blog</title>
 
 
 
 <meta name="description" content="
+  1. Terminus 적용
+  2. 헬스 체크
+  3. TypeOrm 헬스 체크
+  4. 커스텀 상태 표시기
+
+
 ">
 <meta property="og:description" content="
+  1. Terminus 적용
+  2. 헬스 체크
+  3. TypeOrm 헬스 체크
+  4. 커스텀 상태 표시기
+
+
 ">
 
 
@@ -67,8 +79,8 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <!-- =============== -->
 <!-- LINKS           -->
 <!-- =============== -->
-<link rel="canonical" href="http://localhost:4000/tag/dev-nestjs/">
-<meta property="og:url" content="http://localhost:4000/tag/dev-nestjs/">
+<link rel="canonical" href="http://localhost:4000/dev/2024/03/03/15-nest-health-check/">
+<meta property="og:url" content="http://localhost:4000/dev/2024/03/03/15-nest-health-check/">
 <meta name="google-site-verification" content="g4I-a_du23AFdfLFV2vuKYLo_phz8igXQAF3pHc57wA" />
 
 <!-- Google tag (gtag.js) -->
@@ -84,9 +96,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <link rel="alternate" type="application/atom+xml" title="Gmin.Y Blog Feed" href="http://localhost:4000/feed.xml">
 
 
+  <link rel="prev" href="http://localhost:4000/dev/2024/03/03/14-nest-interceptor/">
 
 
-  <link rel="next" href="http://localhost:4000/tag/dev-typescript/">
+
+  <link rel="next" href="http://localhost:4000/dev/2024/03/03/16-nest-cron/">
 
 
 <link rel="apple-touch-icon" href="http://localhost:4000/apple-touch-icon.png">
@@ -178,33 +192,369 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   <div class="fade-in">
     <main id="_main" class="content" role="main" data-color="#4f86aa" data-image="/assets/img/main-left.jpeg">
       <!--<div style="text-align: center;">&lt;!&ndash; 조회수 노출 HITS &ndash;&gt;
-        <a href="http://hits.dwyl.com/localhost:4000/tag/dev-nestjs/"
+        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/03/03/15-nest-health-check/"
            target="_blank">
-          <img src="http://hits.dwyl.com/localhost:4000/tag/dev-nestjs/.svg" /></a>
+          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/03/03/15-nest-health-check/.svg" /></a>
       </div>-->
+      
+
+<article id="post-dev/2024/03/03/15-nest-health-check" class="post" role="article">
+  <header>
+    <h1 class="post-title">
+      
+        [NestJs] 헬스 체크
+      
+    </h1>
+
+    <p class="post-date heading">
+      <time datetime="2024-03-03T00:00:00+09:00">2024-03-03</time>
       
 
 
 
-  <header>
-    <h1 class="page-title">NestJs</h1>
+
+
+
+
+
+
+in <a href="/category/dev/" data-flip="title">DEV</a>
+
+      
+
+
+
+
+
+
+
+
+
+on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+
+    </p>
+
     
   <div class="hr" style="padding-bottom:0"></div>
 
 
   </header>
-  <hr class="sr-only"/>
-
-
+  
 
   
+    <div class="markdown-body">
+
+
+<br/>
+      <ul>
+  <li><a href="#1-terminus-적용">1. Terminus 적용</a></li>
+  <li><a href="#2-헬스-체크">2. 헬스 체크</a></li>
+  <li><a href="#3-typeorm-헬스-체크">3. TypeOrm 헬스 체크</a></li>
+  <li><a href="#4-커스텀-상태-표시기">4. 커스텀 상태 표시기</a></li>
+</ul>
+
+<hr />
+
+<p>장애는 어느 레이어에스든 발생할 수 있다. 현재 서비스 상태를 체크할 장치가 필요하고 이를 헬스 체크라고 부른다.
+서버는 HTTP, DB, 메모리, 디스크 상태 등을 체크하는 헬스 체크 장치가 있어야 한다. 만약 서버 상태에 문제가 있다면 이를 사내 메신저 등을 통해 즉시 담당자에게 알려야 한다.
+Nest 는 Terminus(@nestjs/terminus) 헬스 체크 라이브러리를 제공한다. 이는 다양한 상태 표시기를 제공하며 필요하면 직접 만들어서 사용할 수도 있다.</p>
+
+<h1 id="1-terminus-적용">1. Terminus 적용</h1>
+
+<p>패키지를 설치한다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm i @nestjs/terminus
+</code></pre></div></div>
+
+<p>상태 확인은 특정 라우터 엔드포인트로 요청을 보내고 응답을 확인하는 방법을 사용한다. 이를 위해 HealthCheckController 를 생성한다. TerminusModule과 생성한 컨트롤러를 실행할 수 있도록 준비한다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nest g controller health-check
+</code></pre></div></div>
+
+<ul>
+  <li>app.module.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">TerminusModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/terminus</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">,,,</span>
+    <span class="nx">TerminusModule</span><span class="p">,</span>
+  <span class="p">],</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">[</span><span class="nx">HealthCheckController</span><span class="p">],</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[],</span>
+<span class="p">})</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<h1 id="2-헬스-체크">2. 헬스 체크</h1>
+
+<p>HttpHealthIndicator는 동작 과정에서 @nestjs/axios가 필요하므로 설치한다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm i @nestjs/axios
+</code></pre></div></div>
+
+<ul>
+  <li>app.module.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">TerminusModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/terminus</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">HttpModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/axios</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">,,,</span>
+    <span class="nx">TerminusModule</span><span class="p">,</span>
+    <span class="nx">HttpModule</span>
+  <span class="p">],</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">[</span><span class="nx">HealthCheckController</span><span class="p">],</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[],</span>
+<span class="p">})</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<p>컨트롤러에 HTTP 헬스 체크 코드를 구현한다.</p>
+
+<ul>
+  <li>health-check.controller.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span><span class="p">,</span> <span class="nx">Get</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/common</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">HealthCheckService</span><span class="p">,</span> <span class="nx">HttpHealthIndicator</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/terminus</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Controller</span><span class="p">(</span><span class="dl">'</span><span class="s1">health-check</span><span class="dl">'</span><span class="p">)</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">HealthCheckController</span> <span class="p">{</span>
+  <span class="kd">constructor</span><span class="p">(</span>
+    <span class="kr">private</span> <span class="nx">health</span><span class="p">:</span> <span class="nx">HealthCheckService</span><span class="p">,</span>
+    <span class="kr">private</span> <span class="nx">http</span><span class="p">:</span> <span class="nx">HttpHealthIndicator</span><span class="p">,</span>
+  <span class="p">)</span> <span class="p">{}</span>
+
+  <span class="p">@</span><span class="nd">Get</span><span class="p">()</span>
+  <span class="nx">check</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">health</span><span class="p">.</span><span class="nx">check</span><span class="p">([</span>
+      <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">http</span><span class="p">.</span><span class="nx">pingCheck</span><span class="p">(</span><span class="dl">'</span><span class="s1">nestjs-docs</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">https://docs.nestjs.com</span><span class="dl">'</span><span class="p">),</span> <span class="c1">// 서비스가 제공하는 다른 서버가 잘 동작하는지 확인</span>
+    <span class="p">]);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="3-typeorm-헬스-체크">3. TypeOrm 헬스 체크</h1>
+
+<p>TypeOrmHealthIndicator는 DB 가 잘 살아 있는지 확인한다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span><span class="p">,</span> <span class="nx">Get</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/common</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span>
+  <span class="nx">HealthCheckService</span><span class="p">,</span>
+  <span class="nx">HttpHealthIndicator</span><span class="p">,</span>
+  <span class="nx">TypeOrmHealthIndicator</span><span class="p">,</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/terminus</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Controller</span><span class="p">(</span><span class="dl">'</span><span class="s1">health-check</span><span class="dl">'</span><span class="p">)</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">HealthCheckController</span> <span class="p">{</span>
+  <span class="kd">constructor</span><span class="p">(</span>
+    <span class="kr">private</span> <span class="nx">health</span><span class="p">:</span> <span class="nx">HealthCheckService</span><span class="p">,</span>
+    <span class="kr">private</span> <span class="nx">http</span><span class="p">:</span> <span class="nx">HttpHealthIndicator</span><span class="p">,</span>
+    <span class="kr">private</span> <span class="nx">db</span><span class="p">:</span> <span class="nx">TypeOrmHealthIndicator</span><span class="p">,</span>
+  <span class="p">)</span> <span class="p">{}</span>
+
+  <span class="p">@</span><span class="nd">Get</span><span class="p">()</span>
+  <span class="nx">check</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">health</span><span class="p">.</span><span class="nx">check</span><span class="p">([</span>
+      <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">http</span><span class="p">.</span><span class="nx">pingCheck</span><span class="p">(</span><span class="dl">'</span><span class="s1">nestjs-docs</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">https://docs.nestjs.com</span><span class="dl">'</span><span class="p">),</span>
+      <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">db</span><span class="p">.</span><span class="nx">pingCheck</span><span class="p">(</span><span class="dl">'</span><span class="s1">database</span><span class="dl">'</span><span class="p">),</span>
+    <span class="p">]);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="4-커스텀-상태-표시기">4. 커스텀 상태 표시기</h1>
+
+<p>@nestjs/terminus에서 제공하지 않는 상태 표시기가 필요하다면 HealthIndicator를 상속받는 상태 표시기를 직접 만든다.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="nx">declare</span> <span class="nx">abstract</span> <span class="kd">class</span> <span class="nx">HealthIndicator</span> <span class="p">{</span>
+    <span class="cm">/**
+     * Generates the health indicator result object
+     * @param key The key which will be used as key for the result object
+     * @param isHealthy Whether the health indicator is healthy
+     * @param data Additional data which will get appended to the result object
+     */</span>
+    <span class="kr">protected</span> <span class="nx">getStatus</span><span class="p">(</span><span class="nx">key</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">isHealthy</span><span class="p">:</span> <span class="nx">boolean</span><span class="p">,</span> <span class="nx">data</span><span class="p">?:</span> <span class="p">{</span>
+        <span class="p">[</span><span class="na">key</span><span class="p">:</span> <span class="nx">string</span><span class="p">]:</span> <span class="nx">any</span><span class="p">;</span>
+    <span class="p">}):</span> <span class="nx">HealthIndicatorResult</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>예를 들어 강아지들의 상태를 알려주는 DogHealthIndicator라는 상태 표시기를 구현해보자.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Injectable</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/common</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span>
+  <span class="nx">HealthCheckError</span><span class="p">,</span>
+  <span class="nx">HealthIndicator</span><span class="p">,</span>
+  <span class="nx">HealthIndicatorResult</span><span class="p">,</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/terminus</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kr">interface</span> <span class="nx">Dog</span> <span class="p">{</span>
+  <span class="nl">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="nl">type</span><span class="p">:</span> <span class="nx">string</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">@</span><span class="nd">Injectable</span><span class="p">()</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">DogHealthIndicator</span> <span class="kd">extends</span> <span class="nx">HealthIndicator</span> <span class="p">{</span>
+  <span class="kr">private</span> <span class="nx">dogs</span><span class="p">:</span> <span class="nx">Dog</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Fido</span><span class="dl">'</span><span class="p">,</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">goodboy</span><span class="dl">'</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Rex</span><span class="dl">'</span><span class="p">,</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">badboy</span><span class="dl">'</span> <span class="p">},</span>
+  <span class="p">];</span>
+
+  <span class="k">async</span> <span class="nx">isHealthy</span><span class="p">(</span><span class="nx">key</span><span class="p">:</span> <span class="nx">string</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">HealthIndicatorResult</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">badboys</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">dogs</span><span class="p">.</span><span class="nx">filter</span><span class="p">((</span><span class="nx">dog</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">dog</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">badboy</span><span class="dl">'</span><span class="p">);</span>
+    <span class="kd">const</span> <span class="nx">isHealthy</span> <span class="o">=</span> <span class="nx">badboys</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getStatus</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">isHealthy</span><span class="p">,</span> <span class="p">{</span> <span class="na">badboys</span><span class="p">:</span> <span class="nx">badboys</span><span class="p">.</span><span class="nx">length</span> <span class="p">});</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">isHealthy</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">throw</span> <span class="k">new</span> <span class="nx">HealthCheckError</span><span class="p">(</span><span class="dl">'</span><span class="s1">Dogcheck failed</span><span class="dl">'</span><span class="p">,</span> <span class="nx">result</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>app.module.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">DogHealthIndicator</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./health-check/dog-health.indicator</span><span class="dl">'</span><span class="p">;</span>
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="p">...</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[</span><span class="nx">DogHealthIndicator</span><span class="p">],</span>
+<span class="p">})</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<ul>
+  <li>health-check.controller.ts</li>
+</ul>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span><span class="p">,</span> <span class="nx">Get</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/common</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span>
+  <span class="nx">HealthCheckService</span><span class="p">,</span>
+  <span class="nx">HttpHealthIndicator</span><span class="p">,</span>
+  <span class="nx">TypeOrmHealthIndicator</span><span class="p">,</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/terminus</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">DogHealthIndicator</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./dog-health.indicator</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Controller</span><span class="p">(</span><span class="dl">'</span><span class="s1">health-check</span><span class="dl">'</span><span class="p">)</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">HealthCheckController</span> <span class="p">{</span>
+  <span class="kd">constructor</span><span class="p">(</span>
+    <span class="kr">private</span> <span class="nx">health</span><span class="p">:</span> <span class="nx">HealthCheckService</span><span class="p">,</span>
+    <span class="kr">private</span> <span class="nx">http</span><span class="p">:</span> <span class="nx">HttpHealthIndicator</span><span class="p">,</span>
+    <span class="kr">private</span> <span class="nx">db</span><span class="p">:</span> <span class="nx">TypeOrmHealthIndicator</span><span class="p">,</span>
+    <span class="kr">private</span> <span class="nx">dogHealth</span><span class="p">:</span> <span class="nx">DogHealthIndicator</span><span class="p">,</span>
+  <span class="p">)</span> <span class="p">{}</span>
+
+  <span class="p">@</span><span class="nd">Get</span><span class="p">()</span>
+  <span class="nx">check</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">health</span><span class="p">.</span><span class="nx">check</span><span class="p">([</span>
+      <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">http</span><span class="p">.</span><span class="nx">pingCheck</span><span class="p">(</span><span class="dl">'</span><span class="s1">nestjs-docs</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">https://docs.nestjs.com</span><span class="dl">'</span><span class="p">),</span>
+      <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">db</span><span class="p">.</span><span class="nx">pingCheck</span><span class="p">(</span><span class="dl">'</span><span class="s1">database</span><span class="dl">'</span><span class="p">),</span>
+      <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">dogHealth</span><span class="p">.</span><span class="nx">isHealthy</span><span class="p">(</span><span class="dl">'</span><span class="s1">dog</span><span class="dl">'</span><span class="p">),</span>
+    <span class="p">]);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<hr />
+
+<p><em>본 포스트는 한용재 저자의 <strong>NestJS로 배우는 백엔드 프로그래밍</strong>을 기반으로 스터디하며 정리한 내용들입니다.</em></p>
+
+<ul>
+  <li><a href="http://www.yes24.com/Product/Goods/115850682">NestJS로 배우는 백엔드 프로그래밍</a></li>
+</ul>
+
+      <br/>
+      <br/>
+    </div>
+    <script>
+
+    </script>
+  
+
+</article>
+
+  <hr class="dingbat" />
+
+  <div class="share">
+      <h2>Share this post</h2>
+      <div class="share-body">
+        <a href="http://twitter.com/share?text=[NestJs] 헬스 체크&amp;url=http://localhost:4000/dev/2024/03/03/15-nest-health-check/"
+    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <span class="icon-twitter">
+            </span>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/03/03/15-nest-health-check/"
+    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <span class="icon-facebook">
+            </span>
+        </a>
+    </div>
+  </div>
+  <br/>
+
+
+
+
+
+
+  <aside class="author" role="complementary">
+    <div class="author">
+  <h2 class="page-title hr">
+    About
+  </h2>
+<div class="author-body">
   
     
-    <h2 id="y2024" class="hr">2024</h2>
-    <ul class="related-posts">
+  
+
+  
+
+  <img
+    src="/assets/img/me.jpg"
+    class="me"
+    alt="gmin"
+    srcset="/assets/img/me.jpg 1x,/assets/img/me.jpg 2x"
     
+  />
+
+
   
-  
+  <div class="author-body-description">
+    <p>기술을 통해 사람을 돕고 세상을 이롭게 하는 삶을 지향합니다.</p>
+
+  </div>
+</div>
+</div>
+
+  </aside>
+
+
+
+
+
+<aside class="related" role="complementary">
+  <h2 class="hr">Related Posts</h2>
+
+  <ul class="related-posts">
+    
+      
+      
+      
+        
+        
+          
 
 
 <li class="h4">
@@ -216,11 +566,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
-  
-
-  
-  
-  
+        
+      
+        
+        
+          
 
 
 <li class="h4">
@@ -232,11 +582,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
-  
-
-  
-  
-  
+        
+      
+        
+        
+          
 
 
 <li class="h4">
@@ -248,247 +598,14 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   </time></small>
 </li>
 
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/03/15-nest-health-check/" data-flip="title">
-    <span>[NestJs] 헬스 체크</span>
-  </a>
-  <small><time datetime="2024-03-03T00:00:00+09:00">
-    2024-03-03
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/03/14-nest-interceptor/" data-flip="title">
-    <span>[NestJs] 인터셉터</span>
-  </a>
-  <small><time datetime="2024-03-03T00:00:00+09:00">
-    2024-03-03
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/03/13-nest-exception/" data-flip="title">
-    <span>[NestJs] 예외 처리</span>
-  </a>
-  <small><time datetime="2024-03-03T00:00:00+09:00">
-    2024-03-03
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/03/12-nest-logger-copy/" data-flip="title">
-    <span>[NestJs] 로깅</span>
-  </a>
-  <small><time datetime="2024-03-03T00:00:00+09:00">
-    2024-03-03
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/02/11-nest-guard/" data-flip="title">
-    <span>[NestJs] 권한 확인을 위한 가드</span>
-  </a>
-  <small><time datetime="2024-03-02T00:00:00+09:00">
-    2024-03-02
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/02/10-nest-middleware/" data-flip="title">
-    <span>[NestJs] 미들웨어</span>
-  </a>
-  <small><time datetime="2024-03-02T00:00:00+09:00">
-    2024-03-02
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/02/09-nest-database/" data-flip="title">
-    <span>[NestJs] 영속화 - 데이터베이스 다루기</span>
-  </a>
-  <small><time datetime="2024-03-02T00:00:00+09:00">
-    2024-03-02
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/03/02/08-nest-pipe-validation-check/" data-flip="title">
-    <span>[NestJs] 파이프와 유효성 검사</span>
-  </a>
-  <small><time datetime="2024-03-02T00:00:00+09:00">
-    2024-03-02
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/28/07-nest-dynamic-module-env-config/" data-flip="title">
-    <span>[NestJs] 동적 모듈을 활용한 환경 변수 구성</span>
-  </a>
-  <small><time datetime="2024-02-28T00:00:00+09:00">
-    2024-02-28
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/27/06-nest-module/" data-flip="title">
-    <span>[NestJs] 모듈 설계</span>
-  </a>
-  <small><time datetime="2024-02-27T00:00:00+09:00">
-    2024-02-27
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/25/05-nest-scope/" data-flip="title">
-    <span>[NestJs] 스코프</span>
-  </a>
-  <small><time datetime="2024-02-25T00:00:00+09:00">
-    2024-02-25
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/25/04-nest-provider/" data-flip="title">
-    <span>[NestJs] 프로바이더</span>
-  </a>
-  <small><time datetime="2024-02-25T00:00:00+09:00">
-    2024-02-25
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/24/03-nest-interface/" data-flip="title">
-    <span>[NestJs] 인터페이스</span>
-  </a>
-  <small><time datetime="2024-02-24T00:00:00+09:00">
-    2024-02-24
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/23/02-nest-decorator/" data-flip="title">
-    <span>[NestJs] Decorator</span>
-  </a>
-  <small><time datetime="2024-02-23T00:00:00+09:00">
-    2024-02-23
-  </time></small>
-</li>
-
-  
-
-  
-  
-  
-
-
-<li class="h4">
-  <a href="/dev/2024/02/23/01-nest-basic/" data-flip="title">
-    <span>[NestJs] NestJs 장점 및 설치</span>
-  </a>
-  <small><time datetime="2024-02-23T00:00:00+09:00">
-    2024-02-23
-  </time></small>
-</li>
-
+        
+      
+        
+          
+          
+    
   </ul>
+</aside>
 
 
 
@@ -545,7 +662,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
        
            
              <li>
-               <a class="sidebar-nav-subitem active" href="/tag/dev-nestjs/">NestJs</a>
+               <a class="sidebar-nav-subitem" href="/tag/dev-nestjs/">NestJs</a>
              </li>
            
          
