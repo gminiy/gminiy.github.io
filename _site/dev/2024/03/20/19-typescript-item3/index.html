@@ -35,7 +35,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="format-detection" content="telephone=no">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
-<meta property="og:title" content="[NestJs] 스코프">
+<meta property="og:title" content="[TypeScript] 코드 생성과 타입이 관계 없음을 이해하기">
 <meta property="og:type" content="article">
 
 
@@ -49,28 +49,14 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 
 
 
-  <title>[NestJs] 스코프 &middot; Gmin.Y Blog</title>
+  <title>[TypeScript] 코드 생성과 타입이 관계 없음을 이해하기 &middot; Gmin.Y Blog</title>
 
 
 
-<meta name="description" content="
-  1. 스코프
-    
-      1.1 프로바이더에 스코프 적용
-      1.2 컨트롤러에 스코프 적용
-    
-  
-
+<meta name="description" content="큰 그림에서 타입스크립트 컴파일러는 두 가지 역할을 하는데 이 두 역할은 완전히 독립적이다. - 최신 타입스크립트/자바스크립트를 브라우저에서 동작할 수 있도록 구버전의 자바스크립트로 Transpile(Translate + Compile) - 코드 타입 오류 체크
 
 ">
-<meta property="og:description" content="
-  1. 스코프
-    
-      1.1 프로바이더에 스코프 적용
-      1.2 컨트롤러에 스코프 적용
-    
-  
-
+<meta property="og:description" content="큰 그림에서 타입스크립트 컴파일러는 두 가지 역할을 하는데 이 두 역할은 완전히 독립적이다. - 최신 타입스크립트/자바스크립트를 브라우저에서 동작할 수 있도록 구버전의 자바스크립트로 Transpile(Translate + Compile) - 코드 타입 오류 체크
 
 ">
 
@@ -83,8 +69,8 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <!-- =============== -->
 <!-- LINKS           -->
 <!-- =============== -->
-<link rel="canonical" href="http://localhost:4000/dev/2024/02/25/05-nest-scope/">
-<meta property="og:url" content="http://localhost:4000/dev/2024/02/25/05-nest-scope/">
+<link rel="canonical" href="http://localhost:4000/dev/2024/03/20/19-typescript-item3/">
+<meta property="og:url" content="http://localhost:4000/dev/2024/03/20/19-typescript-item3/">
 <meta name="google-site-verification" content="g4I-a_du23AFdfLFV2vuKYLo_phz8igXQAF3pHc57wA" />
 
 <!-- Google tag (gtag.js) -->
@@ -100,11 +86,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <link rel="alternate" type="application/atom+xml" title="Gmin.Y Blog Feed" href="http://localhost:4000/feed.xml">
 
 
-  <link rel="prev" href="http://localhost:4000/dev/2024/02/25/04-nest-provider/">
+  <link rel="prev" href="http://localhost:4000/dev/2024/03/04/18-nest-clean-architecture/">
 
 
 
-  <link rel="next" href="http://localhost:4000/dev/2024/02/27/06-nest-module/">
+  <link rel="next" href="http://localhost:4000/dev/2024/03/22/20-nest-config-module-async/">
 
 
 <link rel="apple-touch-icon" href="http://localhost:4000/apple-touch-icon.png">
@@ -196,22 +182,22 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   <div class="fade-in">
     <main id="_main" class="content" role="main" data-color="#4f86aa" data-image="/assets/img/main-left.jpeg">
       <!--<div style="text-align: center;">&lt;!&ndash; 조회수 노출 HITS &ndash;&gt;
-        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/02/25/05-nest-scope/"
+        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/03/20/19-typescript-item3/"
            target="_blank">
-          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/02/25/05-nest-scope/.svg" /></a>
+          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/03/20/19-typescript-item3/.svg" /></a>
       </div>-->
       
 
-<article id="post-dev/2024/02/25/05-nest-scope" class="post" role="article">
+<article id="post-dev/2024/03/20/19-typescript-item3" class="post" role="article">
   <header>
     <h1 class="post-title">
       
-        [NestJs] 스코프
+        [TypeScript] 코드 생성과 타입이 관계 없음을 이해하기
       
     </h1>
 
     <p class="post-date heading">
-      <time datetime="2024-02-25T00:00:00+09:00">2024-02-25</time>
+      <time datetime="2024-03-20T00:00:00+09:00">2024-03-20</time>
       
 
 
@@ -234,7 +220,7 @@ in <a href="/category/dev/" data-flip="title">DEV</a>
 
 
 
-on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+on <a href="/tag/dev-typescript/" data-flip="title">TypeScript</a>
 
     </p>
 
@@ -250,74 +236,175 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 
 
 <br/>
-      <ul>
-  <li><a href="#1-스코프">1. 스코프</a>
-    <ul>
-      <li><a href="#11-프로바이더에-스코프-적용">1.1 프로바이더에 스코프 적용</a></li>
-      <li><a href="#12-컨트롤러에-스코프-적용">1.2 컨트롤러에 스코프 적용</a></li>
-    </ul>
-  </li>
+      <p>큰 그림에서 타입스크립트 컴파일러는 두 가지 역할을 하는데 이 두 역할은 완전히 독립적이다. - 최신 타입스크립트/자바스크립트를 브라우저에서 동작할 수 있도록 구버전의 자바스크립트로 Transpile(Translate + Compile) - 코드 타입 오류 체크</p>
+
+<h3 id="1-타입-오류가-있는-코드도-컴파일이-가능하다">1. 타입 오류가 있는 코드도 컴파일이 가능하다.</h3>
+
+<p>컴파일은 타입 체크와 독립적으로 동작하기 때문에, 타입 오류가 있는 코드도 컴피일이 가능하다.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>test.ts
+<span class="nb">let </span>x <span class="o">=</span> <span class="s1">'hello'</span><span class="p">;</span>
+x <span class="o">=</span> 1234<span class="p">;</span>
+
+<span class="nv">$ </span>tsc test.ts
+test.ts:2:1 - error TS2322: Type <span class="s1">'number'</span> is not assignable to <span class="nb">type</span> <span class="s1">'string'</span><span class="nb">.</span>
+
+2 x <span class="o">=</span> 1234<span class="p">;</span>
+
+<span class="nv">$ </span><span class="nb">cat </span>test.js
+var x <span class="o">=</span> <span class="s1">'hello'</span><span class="p">;</span>
+x <span class="o">=</span> 1234<span class="p">;</span>
+</code></pre></div></div>
+
+<p>타입스크립트 오류는 Warning과 비슷하다. 문제가 될 만한 부분을 알려 주지만, 빌드를 멈추지는 않는다.</p>
+
+<p>타입 오류가 있어도 컴파일을 하기 때문에 오류를 수정하지 않더라도 애플리케이션의 다른 부분을 테스트할 수 있다.
+타입 오류가 있을 때 컴파일하지 않으려면, tsconfig.json에 noEmitOnError를 설정한다.</p>
+
+<h3 id="2-런타임에는-타입-체크가-불가능하다">2. 런타임에는 타입 체크가 불가능하다.</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">Squere</span> <span class="p">{</span>
+  <span class="nl">width</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">Rectangle</span> <span class="kd">extends</span> <span class="nx">Squere</span> <span class="p">{</span>
+  <span class="nl">height</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">Shape</span> <span class="o">=</span> <span class="nx">Squere</span> <span class="o">|</span> <span class="nx">Rectangle</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">calculateArea</span><span class="p">(</span><span class="nx">shape</span><span class="p">:</span> <span class="nx">Shape</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">shape</span> <span class="k">instanceof</span> <span class="nx">Rectangle</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">shape</span><span class="p">.</span><span class="nx">width</span> <span class="o">*</span> <span class="nx">shape</span><span class="p">.</span><span class="nx">height</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">shape</span><span class="p">.</span><span class="nx">width</span> <span class="o">*</span> <span class="nx">shape</span><span class="p">.</span><span class="nx">width</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>instanceof 체크는 런타임에 실행되지만 Rectangle은 타입이기 때문에 런타임 시점에 아무런 역할을 할 수 없다.’</p>
+
+<p>타입 정보를 유지하는 방법 중 태그를 다는 방법이 있다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">Squere</span> <span class="p">{</span>
+  <span class="nl">kind</span><span class="p">:</span> <span class="dl">"</span><span class="s2">square</span><span class="dl">"</span><span class="p">;</span>
+  <span class="nl">width</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">Rectangle</span> <span class="p">{</span>
+  <span class="nl">kind</span><span class="p">:</span> <span class="dl">"</span><span class="s2">rectangle</span><span class="dl">"</span><span class="p">;</span>
+  <span class="nl">height</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">width</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">Shape</span> <span class="o">=</span> <span class="nx">Squere</span> <span class="o">|</span> <span class="nx">Rectangle</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">calculateArea</span><span class="p">(</span><span class="nx">shape</span><span class="p">:</span> <span class="nx">Shape</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">shape</span><span class="p">.</span><span class="nx">kind</span> <span class="o">===</span> <span class="dl">"</span><span class="s2">rectangle</span><span class="dl">"</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">shape</span><span class="p">.</span><span class="nx">width</span> <span class="o">*</span> <span class="nx">shape</span><span class="p">.</span><span class="nx">height</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">shape</span><span class="p">.</span><span class="nx">width</span> <span class="o">*</span> <span class="nx">shape</span><span class="p">.</span><span class="nx">width</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>또는 타입(런타임 접근 불가)과 값(런타임 접근 가능)을 둘 다 사용하는 기법도 있다. 타입을 클래스로 만든다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">Squere</span> <span class="p">{</span>
+  <span class="kd">constructor</span><span class="p">(</span><span class="k">public</span> <span class="nx">width</span><span class="p">:</span> <span class="kr">number</span><span class="p">)</span> <span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nx">Rectangle</span> <span class="kd">extends</span> <span class="nx">Squere</span> <span class="p">{</span>
+  <span class="kd">constructor</span><span class="p">(</span><span class="k">public</span> <span class="nx">width</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="k">public</span> <span class="nx">height</span><span class="p">:</span> <span class="kr">number</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">super</span><span class="p">(</span><span class="nx">width</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">Shape</span> <span class="o">=</span> <span class="nx">Squere</span> <span class="o">|</span> <span class="nx">Rectangle</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">calculateArea</span><span class="p">(</span><span class="nx">shape</span><span class="p">:</span> <span class="nx">Shape</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">shape</span> <span class="k">instanceof</span> <span class="nx">Rectangle</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">shape</span><span class="p">.</span><span class="nx">width</span> <span class="o">*</span> <span class="nx">shape</span><span class="p">.</span><span class="nx">height</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">shape</span><span class="p">.</span><span class="nx">width</span> <span class="o">*</span> <span class="nx">shape</span><span class="p">.</span><span class="nx">width</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="타입-연산은-런타임에-영향을-주지-않습니다">타입 연산은 런타임에 영향을 주지 않습니다.</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">asNumber</span><span class="p">(</span><span class="nx">val</span><span class="p">:</span> <span class="kr">number</span> <span class="o">|</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">val</span> <span class="k">as</span> <span class="kr">number</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>이 코드는 타입 체커는 통과하지만 number로 값이 정제되지 않는다. as number는 타입 연산이고 런타임 동작에는 아무런 영향을 주지 않는다. 이를 위해서는 런타임의 타입을 체크하고 자바스크립트 연산을 통해 변환해야한다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">asNumber</span><span class="p">(</span><span class="nx">val</span><span class="p">:</span> <span class="kr">number</span> <span class="o">|</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">typeof</span><span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">string</span><span class="dl">'</span> <span class="p">?</span> <span class="nb">Number</span><span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">:</span> <span class="nx">val</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="런타임-타입은-선언된-타입과-다를-수-있습니다">런타임 타입은 선언된 타입과 다를 수 있습니다.</h3>
+
+<p>다음 함수에서 default는 죽은(dead) 코드이다. 여기서는 타입스크립트가 죽은 코드를 찾아내지 못한다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">setLightSwitch</span><span class="p">(</span><span class="nx">value</span><span class="p">:</span> <span class="nx">boolean</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">switch</span> <span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="p">(</span><span class="kc">true</span><span class="p">):</span>
+      <span class="nx">turnLightOn</span><span class="p">();</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="kc">false</span><span class="p">:</span>
+      <span class="nx">turnLightOff</span><span class="p">();</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="nl">default</span><span class="p">:</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">실행되지 않습니다.</span><span class="dl">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>: boolean이 런타임에 제거된다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">LightApiResponse</span> <span class="p">{</span>
+  <span class="nl">lightSwitchvalue</span><span class="p">:</span> <span class="nx">boolean</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">setLight</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">res</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">/light</span><span class="dl">'</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">result</span><span class="p">:</span> <span class="nx">LightApiResponse</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+  <span class="nx">setLightSwitch</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">lightSwitchValue</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>api에서 받아온 lightSwitchValue가 boolean이라는 보장이 없다. 즉, 문자열이 될 수도 있는 것이다.
+타입스크립트에서는 런타임 타입과 선언된 타입이 다를 수 있다는 것을 항상 명심해야한다.</p>
+
+<h3 id="타입스크립트-타입으로는-함수를-오버로드할-수-없습니다">타입스크립트 타입으로는 함수를 오버로드할 수 없습니다.</h3>
+
+<p>동일한 이름에 매개변수만 다른 여러 버전의 함수를 만드는 ‘오버로딩’을 타입스크립트는 할 수 없다. 런타임의 동작과 타입 체크는 무관하기 때문이다.</p>
+
+<p>타입스크립트가 함수 오버로딩 기능을 지원하지만 타입 수준에서만 동작한다. 즉, 선언문을 작성할 수 있지만 구현체는 하나다.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 중복된 함수 구현</span>
+<span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">b</span><span class="p">:</span> <span class="kr">number</span><span class="p">):</span> <span class="kr">number</span><span class="p">;</span>
+<span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="kr">string</span><span class="p">,</span> <span class="nx">b</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">string</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">three</span> <span class="o">=</span> <span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span> <span class="c1">// type number</span>
+<span class="kd">const</span> <span class="nx">twelve</span> <span class="o">=</span> <span class="nx">add</span><span class="p">(</span><span class="dl">"</span><span class="s2">1</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">2</span><span class="dl">"</span><span class="p">);</span> <span class="c1">// type string</span>
+</code></pre></div></div>
+
+<h3 id="타입스크립트-타입은-런타임-성능에-영향을-주지-않는다">타입스크립트 타입은 런타임 성능에 영향을 주지 않는다.</h3>
+
+<ul>
+  <li>타입과 타입 연산자는 컴파일시 제거되기 때문에 런타임 성능에 영향을 주지 않는다.</li>
+  <li>런타임 오버헤드가 없는 대신, 타입스크립트 컴파일러는 ‘빌드타임’ 오버헤드가 있다. 그렇지만 타입스크립트 컴파일은 일반적으로는 빠른 편이다. 오버헤드가 커지면, 빌드 도구에서 ‘transpile only’를 설정하여 타입 체크를 건너뛸 수 있다.</li>
+  <li>타입스크립트는 코드 컴파일 시 호환성과 성능 중 하나를 선택하게 되는 문제에 맞닥뜨릴 수도 있다. 예를 들어 제너레이터 함수가 ES5타깃으로 컴파일되려면, 타입스크립트 컴파일러는 호환성을 위한 특정 헬퍼 코드를 추가할 것이다.</li>
 </ul>
 
 <hr />
 
-<h1 id="1-스코프">1. 스코프</h1>
-
-<p>Node.JS는 멀티 스레드 상태 비저장 모델을 따르지 않기 때문에 싱글턴 인스턴스를 사용하는 것이 권장된다.
-하지만 요청별로 캐싱을 한다거나 요청 추적, 또는 멀티테넌시를 지원하기 위해서는 요청 기반으로 생명주기를 제한해야 한다.</p>
-
-<p>아래는 스코프 종류이다.</p>
+<p><em>본 포스트는 댄 밴더캄 저자의 <strong>이펙티브 타입스크립트</strong>를 기반으로 스터디하며 정리한 내용들입니다.</em></p>
 
 <ul>
-  <li>
-    <p>Default
-싱글턴 인스턴스가 전체 애플리케이션에 공유됨
-인스턴스 수명은 애플리케이션 생명주기와 같다.
-애플리케이션이 부팅되면 모든 싱글턴 프로바이더의 인스턴스가 만들어진다.</p>
-  </li>
-  <li>
-    <p>Request
-들어오는 요청마다 별도의 인스턴스가 생성됨
-요청을 처리하고 나면 인스턴스는 garbage-collected 됨</p>
-  </li>
-  <li>
-    <p>Transient
-인스턴스는 공유되지 않는다.
-이 프로바이더를 주입하는 각 컴포넌트는 새로 생성된 전용 인스턴스를 주입받는다.</p>
-  </li>
-</ul>
-
-<hr />
-
-<h2 id="11-프로바이더에-스코프-적용">1.1 프로바이더에 스코프 적용</h2>
-
-<p>@Injectable 데코레이터에 scope속성을 주는 방법</p>
-
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Injectable</span><span class="p">,</span> <span class="nx">Scope</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
-
-<span class="p">@</span><span class="nd">Injectable</span><span class="p">({</span> <span class="na">scope</span><span class="p">:</span> <span class="nx">Scope</span><span class="p">.</span><span class="nx">REQUEST</span> <span class="p">})</span>
-<span class="k">export</span> <span class="kd">class</span> <span class="nx">CatsService</span> <span class="p">{}</span>
-</code></pre></div></div>
-
-<hr />
-
-<h2 id="12-컨트롤러에-스코프-적용">1.2 컨트롤러에 스코프 적용</h2>
-
-<p>@Controller 데코레이터는 ControllerOptions를 인수로 받을 수 있다. ContorllerOptions는 ScopeOptions를 상속한다.</p>
-
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Constroller</span><span class="p">({</span>
-  <span class="na">path</span><span class="p">:</span> <span class="dl">"</span><span class="s2">cats</span><span class="dl">"</span><span class="p">,</span>
-  <span class="na">scope</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Scope.REQUEST</span><span class="dl">"</span><span class="p">,</span>
-<span class="p">})</span>
-<span class="k">export</span> <span class="kd">class</span> <span class="nx">CatsController</span> <span class="p">{}</span>
-</code></pre></div></div>
-
-<hr />
-
-<p><em>본 포스트는 한용재 저자의 <strong>NestJS로 배우는 백엔드 프로그래밍</strong>을 기반으로 스터디하며 정리한 내용들입니다.</em></p>
-
-<ul>
-  <li><a href="http://www.yes24.com/Product/Goods/115850682">NestJS로 배우는 백엔드 프로그래밍</a></li>
+  <li><a href="https://product.kyobobook.co.kr/detail/S000001033114">이펙티브 타입스크립트</a></li>
 </ul>
 
       <br/>
@@ -335,12 +422,12 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
   <div class="share">
       <h2>Share this post</h2>
       <div class="share-body">
-        <a href="http://twitter.com/share?text=[NestJs] 스코프&amp;url=http://localhost:4000/dev/2024/02/25/05-nest-scope/"
+        <a href="http://twitter.com/share?text=[TypeScript] 코드 생성과 타입이 관계 없음을 이해하기&amp;url=http://localhost:4000/dev/2024/03/20/19-typescript-item3/"
     onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
             <span class="icon-twitter">
             </span>
         </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/02/25/05-nest-scope/"
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/03/20/19-typescript-item3/"
     onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
             <span class="icon-facebook">
             </span>
@@ -414,21 +501,8 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
         
       
         
-        
           
-
-
-<li class="h4">
-  <a href="/dev/2024/03/20/19-typescript-item3/" data-flip="title">
-    <span>[TypeScript] 코드 생성과 타입이 관계 없음을 이해하기</span>
-  </a>
-  <small><time datetime="2024-03-20T00:00:00+09:00">
-    2024-03-20
-  </time></small>
-</li>
-
-        
-      
+          
         
         
           
@@ -446,6 +520,19 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
         
       
         
+        
+          
+
+
+<li class="h4">
+  <a href="/dev/2024/03/03/17-nest-cqrs/" data-flip="title">
+    <span>[NestJs] CQRS</span>
+  </a>
+  <small><time datetime="2024-03-03T00:00:00+09:00">
+    2024-03-03
+  </time></small>
+</li>
+
         
       
     

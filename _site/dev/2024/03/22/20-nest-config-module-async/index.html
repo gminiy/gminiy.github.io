@@ -35,7 +35,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="format-detection" content="telephone=no">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
-<meta property="og:title" content="[NestJs] 스코프">
+<meta property="og:title" content="[NestJs] ConfigModule 비동기로 사용하기">
 <meta property="og:type" content="article">
 
 
@@ -49,28 +49,14 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 
 
 
-  <title>[NestJs] 스코프 &middot; Gmin.Y Blog</title>
+  <title>[NestJs] ConfigModule 비동기로 사용하기 &middot; Gmin.Y Blog</title>
 
 
 
-<meta name="description" content="
-  1. 스코프
-    
-      1.1 프로바이더에 스코프 적용
-      1.2 컨트롤러에 스코프 적용
-    
-  
-
+<meta name="description" content="문제
 
 ">
-<meta property="og:description" content="
-  1. 스코프
-    
-      1.1 프로바이더에 스코프 적용
-      1.2 컨트롤러에 스코프 적용
-    
-  
-
+<meta property="og:description" content="문제
 
 ">
 
@@ -83,8 +69,8 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <!-- =============== -->
 <!-- LINKS           -->
 <!-- =============== -->
-<link rel="canonical" href="http://localhost:4000/dev/2024/02/25/05-nest-scope/">
-<meta property="og:url" content="http://localhost:4000/dev/2024/02/25/05-nest-scope/">
+<link rel="canonical" href="http://localhost:4000/dev/2024/03/22/20-nest-config-module-async/">
+<meta property="og:url" content="http://localhost:4000/dev/2024/03/22/20-nest-config-module-async/">
 <meta name="google-site-verification" content="g4I-a_du23AFdfLFV2vuKYLo_phz8igXQAF3pHc57wA" />
 
 <!-- Google tag (gtag.js) -->
@@ -100,11 +86,9 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <link rel="alternate" type="application/atom+xml" title="Gmin.Y Blog Feed" href="http://localhost:4000/feed.xml">
 
 
-  <link rel="prev" href="http://localhost:4000/dev/2024/02/25/04-nest-provider/">
+  <link rel="prev" href="http://localhost:4000/dev/2024/03/20/19-typescript-item3/">
 
 
-
-  <link rel="next" href="http://localhost:4000/dev/2024/02/27/06-nest-module/">
 
 
 <link rel="apple-touch-icon" href="http://localhost:4000/apple-touch-icon.png">
@@ -196,22 +180,22 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   <div class="fade-in">
     <main id="_main" class="content" role="main" data-color="#4f86aa" data-image="/assets/img/main-left.jpeg">
       <!--<div style="text-align: center;">&lt;!&ndash; 조회수 노출 HITS &ndash;&gt;
-        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/02/25/05-nest-scope/"
+        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/03/22/20-nest-config-module-async/"
            target="_blank">
-          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/02/25/05-nest-scope/.svg" /></a>
+          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/03/22/20-nest-config-module-async/.svg" /></a>
       </div>-->
       
 
-<article id="post-dev/2024/02/25/05-nest-scope" class="post" role="article">
+<article id="post-dev/2024/03/22/20-nest-config-module-async" class="post" role="article">
   <header>
     <h1 class="post-title">
       
-        [NestJs] 스코프
+        [NestJs] ConfigModule 비동기로 사용하기
       
     </h1>
 
     <p class="post-date heading">
-      <time datetime="2024-02-25T00:00:00+09:00">2024-02-25</time>
+      <time datetime="2024-03-22T00:00:00+09:00">2024-03-22</time>
       
 
 
@@ -250,75 +234,93 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 
 
 <br/>
-      <ul>
-  <li><a href="#1-스코프">1. 스코프</a>
-    <ul>
-      <li><a href="#11-프로바이더에-스코프-적용">1.1 프로바이더에 스코프 적용</a></li>
-      <li><a href="#12-컨트롤러에-스코프-적용">1.2 컨트롤러에 스코프 적용</a></li>
-    </ul>
-  </li>
-</ul>
+      <h2 id="문제">문제</h2>
 
-<hr />
-
-<h1 id="1-스코프">1. 스코프</h1>
-
-<p>Node.JS는 멀티 스레드 상태 비저장 모델을 따르지 않기 때문에 싱글턴 인스턴스를 사용하는 것이 권장된다.
-하지만 요청별로 캐싱을 한다거나 요청 추적, 또는 멀티테넌시를 지원하기 위해서는 요청 기반으로 생명주기를 제한해야 한다.</p>
-
-<p>아래는 스코프 종류이다.</p>
+<p>Nest에서 ConfigModule을 이용해 환경변수를 전역으로 사용하는데 JwtModule 생성시 ConfigModule을 통해 환경변수를 읽어오지 못하는 이슈가 있었다.</p>
 
 <ul>
-  <li>
-    <p>Default
-싱글턴 인스턴스가 전체 애플리케이션에 공유됨
-인스턴스 수명은 애플리케이션 생명주기와 같다.
-애플리케이션이 부팅되면 모든 싱글턴 프로바이더의 인스턴스가 만들어진다.</p>
-  </li>
-  <li>
-    <p>Request
-들어오는 요청마다 별도의 인스턴스가 생성됨
-요청을 처리하고 나면 인스턴스는 garbage-collected 됨</p>
-  </li>
-  <li>
-    <p>Transient
-인스턴스는 공유되지 않는다.
-이 프로바이더를 주입하는 각 컴포넌트는 새로 생성된 전용 인스턴스를 주입받는다.</p>
-  </li>
+  <li>app.module.ts</li>
 </ul>
 
-<hr />
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Module</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">AppController</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./app.controller</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">AuthModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./auth/infrastructure/in/auth.module</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">ConfigModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/config</span><span class="dl">"</span><span class="p">;</span>
 
-<h2 id="11-프로바이더에-스코프-적용">1.1 프로바이더에 스코프 적용</h2>
-
-<p>@Injectable 데코레이터에 scope속성을 주는 방법</p>
-
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Injectable</span><span class="p">,</span> <span class="nx">Scope</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
-
-<span class="p">@</span><span class="nd">Injectable</span><span class="p">({</span> <span class="na">scope</span><span class="p">:</span> <span class="nx">Scope</span><span class="p">.</span><span class="nx">REQUEST</span> <span class="p">})</span>
-<span class="k">export</span> <span class="kd">class</span> <span class="nx">CatsService</span> <span class="p">{}</span>
-</code></pre></div></div>
-
-<hr />
-
-<h2 id="12-컨트롤러에-스코프-적용">1.2 컨트롤러에 스코프 적용</h2>
-
-<p>@Controller 데코레이터는 ControllerOptions를 인수로 받을 수 있다. ContorllerOptions는 ScopeOptions를 상속한다.</p>
-
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">@</span><span class="nd">Constroller</span><span class="p">({</span>
-  <span class="na">path</span><span class="p">:</span> <span class="dl">"</span><span class="s2">cats</span><span class="dl">"</span><span class="p">,</span>
-  <span class="na">scope</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Scope.REQUEST</span><span class="dl">"</span><span class="p">,</span>
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span>
+    <span class="nx">ConfigModule</span><span class="p">.</span><span class="nx">forRoot</span><span class="p">({</span>
+      <span class="na">envFilePath</span><span class="p">:</span> <span class="p">[</span><span class="s2">`</span><span class="p">${</span><span class="nx">__dirname</span><span class="p">}</span><span class="s2">/config/env/.</span><span class="p">${</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span><span class="p">}</span><span class="s2">.env`</span><span class="p">],</span>
+      <span class="na">isGlobal</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="p">}),</span>
+    <span class="nx">AuthModule</span><span class="p">,</span>
+  <span class="p">],</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">[</span><span class="nx">AppController</span><span class="p">],</span>
+  <span class="na">providers</span><span class="p">:</span> <span class="p">[],</span>
 <span class="p">})</span>
-<span class="k">export</span> <span class="kd">class</span> <span class="nx">CatsController</span> <span class="p">{}</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">AppModule</span> <span class="p">{}</span>
 </code></pre></div></div>
 
-<hr />
+<ul>
+  <li>auth.module.ts</li>
+</ul>
 
-<p><em>본 포스트는 한용재 저자의 <strong>NestJS로 배우는 백엔드 프로그래밍</strong>을 기반으로 스터디하며 정리한 내용들입니다.</em></p>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Module</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">AuthController</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./controller/auth.controller</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">JwtModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/jwt</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span>
+    <span class="nx">TypeOrmModule</span><span class="p">.</span><span class="nx">forFeature</span><span class="p">([</span><span class="nx">UserEntity</span><span class="p">]),</span>
+    <span class="nx">JwtModule</span><span class="p">.</span><span class="nx">register</span><span class="p">({</span>
+      <span class="na">secret</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">JWT_SECRET</span><span class="p">,</span> <span class="c1">// undefined</span>
+      <span class="na">signOptions</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">expiresIn</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">JWT_ACCESS_TOKEN_EXPIRES_IN</span><span class="p">,</span> <span class="c1">// undefind</span>
+      <span class="p">},</span>
+    <span class="p">}),</span>
+  <span class="p">],</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">[</span><span class="nx">AuthController</span><span class="p">],</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">AuthModule</span> <span class="p">{}</span>
+</code></pre></div></div>
+
+<p>AuthModule에서 JwtModule을 import할때 환경 변수들을 ConfigModule을 통해 받기를 기대했지만 undefined로 읽어오게 된다.</p>
+
+<h2 id="원인">원인</h2>
+
+<p>ConfigModule은 모듈 로딩시 비동기로 수행된다. 즉, 다른 모듈들이 ConfigModule을 사용할때 ConfigModule의 로딩이 완료되었다는 보장을 하지 않는다.</p>
+
+<h2 id="해결">해결</h2>
+
+<p>Async 메소드를 통해 모듈의 준비 상태를 확인하고 사용할 수 있다. 이번 경우에는 ConfigService를 주입함으로써 ConfigModule이 초기화되고 ConfigService가 준비될때까지 기다린 후 모듈을 생성하게 만들 수 있다.</p>
 
 <ul>
-  <li><a href="http://www.yes24.com/Product/Goods/115850682">NestJS로 배우는 백엔드 프로그래밍</a></li>
+  <li>auth.module.ts</li>
 </ul>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Module</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">AuthController</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./controller/auth.controller</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">JwtModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/jwt</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">ConfigModule</span><span class="p">,</span> <span class="nx">ConfigService</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/config</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
+  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span>
+    <span class="nx">TypeOrmModule</span><span class="p">.</span><span class="nx">forFeature</span><span class="p">([</span><span class="nx">UserEntity</span><span class="p">]),</span>
+    <span class="nx">JwtModule</span><span class="p">.</span><span class="nx">registerAsync</span><span class="p">({</span>
+      <span class="na">imports</span><span class="p">:</span> <span class="p">[</span><span class="nx">ConfigModule</span><span class="p">],</span>
+      <span class="na">inject</span><span class="p">:</span> <span class="p">[</span><span class="nx">ConfigService</span><span class="p">],</span>
+      <span class="na">useFactory</span><span class="p">:</span> <span class="k">async</span> <span class="p">(</span><span class="na">configService</span><span class="p">:</span> <span class="nx">ConfigService</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">({</span>
+        <span class="na">secret</span><span class="p">:</span> <span class="nx">configService</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">JWT_SECRET</span><span class="dl">"</span><span class="p">),</span>
+        <span class="na">signOptions</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">expiresIn</span><span class="p">:</span> <span class="nx">configService</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">JWT_ACCESS_TOKEN_EXPIRES_IN</span><span class="dl">"</span><span class="p">),</span>
+        <span class="p">},</span>
+      <span class="p">}),</span>
+    <span class="p">}),</span>
+  <span class="p">],</span>
+  <span class="na">controllers</span><span class="p">:</span> <span class="p">[</span><span class="nx">AuthController</span><span class="p">],</span>
+<span class="p">})</span>
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">AuthModule</span> <span class="p">{}</span>
+</code></pre></div></div>
 
       <br/>
       <br/>
@@ -335,12 +337,12 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
   <div class="share">
       <h2>Share this post</h2>
       <div class="share-body">
-        <a href="http://twitter.com/share?text=[NestJs] 스코프&amp;url=http://localhost:4000/dev/2024/02/25/05-nest-scope/"
+        <a href="http://twitter.com/share?text=[NestJs] ConfigModule 비동기로 사용하기&amp;url=http://localhost:4000/dev/2024/03/22/20-nest-config-module-async/"
     onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
             <span class="icon-twitter">
             </span>
         </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/02/25/05-nest-scope/"
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/03/22/20-nest-config-module-async/"
     onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
             <span class="icon-facebook">
             </span>
@@ -398,21 +400,8 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
       
       
         
-        
           
-
-
-<li class="h4">
-  <a href="/dev/2024/03/22/20-nest-config-module-async/" data-flip="title">
-    <span>[NestJs] ConfigModule 비동기로 사용하기</span>
-  </a>
-  <small><time datetime="2024-03-22T00:00:00+09:00">
-    2024-03-22
-  </time></small>
-</li>
-
-        
-      
+          
         
         
           
@@ -446,6 +435,19 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
         
       
         
+        
+          
+
+
+<li class="h4">
+  <a href="/dev/2024/03/03/17-nest-cqrs/" data-flip="title">
+    <span>[NestJs] CQRS</span>
+  </a>
+  <small><time datetime="2024-03-03T00:00:00+09:00">
+    2024-03-03
+  </time></small>
+</li>
+
         
       
     
