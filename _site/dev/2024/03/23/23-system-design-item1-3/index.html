@@ -35,7 +35,7 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="format-detection" content="telephone=no">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
-<meta property="og:title" content="[NestJs] 태스크 스케줄링">
+<meta property="og:title" content="[대규모 시스템 설계] 사용자 수에 따른 규모 확장성 - 캐시, CDN">
 <meta property="og:type" content="article">
 
 
@@ -49,34 +49,14 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 
 
 
-  <title>[NestJs] 태스크 스케줄링 &middot; Gmin.Y Blog</title>
+  <title>[대규모 시스템 설계] 사용자 수에 따른 규모 확장성 - 캐시, CDN &middot; Gmin.Y Blog</title>
 
 
 
-<meta name="description" content="
-  1. @nestjs/schedule 패키지
-  2. 태스크 스케줄링을 선언하는 방식
-    
-      2.1 크론 잡 선언 방식
-      2.2 인터벌 선언 방식
-      2.3 타임아웃 선언 방식
-    
-  
-  3. 동적 태스크 스케줄링
-
+<meta name="description" content="캐시
 
 ">
-<meta property="og:description" content="
-  1. @nestjs/schedule 패키지
-  2. 태스크 스케줄링을 선언하는 방식
-    
-      2.1 크론 잡 선언 방식
-      2.2 인터벌 선언 방식
-      2.3 타임아웃 선언 방식
-    
-  
-  3. 동적 태스크 스케줄링
-
+<meta property="og:description" content="캐시
 
 ">
 
@@ -89,8 +69,8 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <!-- =============== -->
 <!-- LINKS           -->
 <!-- =============== -->
-<link rel="canonical" href="http://localhost:4000/dev/2024/03/03/16-nest-cron/">
-<meta property="og:url" content="http://localhost:4000/dev/2024/03/03/16-nest-cron/">
+<link rel="canonical" href="http://localhost:4000/dev/2024/03/23/23-system-design-item1-3/">
+<meta property="og:url" content="http://localhost:4000/dev/2024/03/23/23-system-design-item1-3/">
 <meta name="google-site-verification" content="g4I-a_du23AFdfLFV2vuKYLo_phz8igXQAF3pHc57wA" />
 
 <!-- Google tag (gtag.js) -->
@@ -106,11 +86,11 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
 <link rel="alternate" type="application/atom+xml" title="Gmin.Y Blog Feed" href="http://localhost:4000/feed.xml">
 
 
-  <link rel="prev" href="http://localhost:4000/dev/2024/03/03/15-nest-health-check/">
+  <link rel="prev" href="http://localhost:4000/dev/2024/03/23/22-system-design-item1-2/">
 
 
 
-  <link rel="next" href="http://localhost:4000/dev/2024/03/03/17-nest-cqrs/">
+  <link rel="next" href="http://localhost:4000/dev/2024/03/23/24-system-design-item1-4/">
 
 
 <link rel="apple-touch-icon" href="http://localhost:4000/apple-touch-icon.png">
@@ -202,22 +182,22 @@ Powered by Hydejack v6.4.0 (https://qwtel.com/hydejack/)
   <div class="fade-in">
     <main id="_main" class="content" role="main" data-color="#4f86aa" data-image="/assets/img/main-left.jpeg">
       <!--<div style="text-align: center;">&lt;!&ndash; 조회수 노출 HITS &ndash;&gt;
-        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/03/03/16-nest-cron/"
+        <a href="http://hits.dwyl.com/localhost:4000/dev/2024/03/23/23-system-design-item1-3/"
            target="_blank">
-          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/03/03/16-nest-cron/.svg" /></a>
+          <img src="http://hits.dwyl.com/localhost:4000/dev/2024/03/23/23-system-design-item1-3/.svg" /></a>
       </div>-->
       
 
-<article id="post-dev/2024/03/03/16-nest-cron" class="post" role="article">
+<article id="post-dev/2024/03/23/23-system-design-item1-3" class="post" role="article">
   <header>
     <h1 class="post-title">
       
-        [NestJs] 태스크 스케줄링
+        [대규모 시스템 설계] 사용자 수에 따른 규모 확장성 - 캐시, CDN
       
     </h1>
 
     <p class="post-date heading">
-      <time datetime="2024-03-03T00:00:00+09:00">2024-03-03</time>
+      <time datetime="2024-03-23T00:00:00+09:00">2024-03-23</time>
       
 
 
@@ -240,7 +220,7 @@ in <a href="/category/dev/" data-flip="title">DEV</a>
 
 
 
-on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
+on <a href="/tag/dev-server/" data-flip="title">Server</a>
 
     </p>
 
@@ -256,189 +236,61 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
 
 
 <br/>
-      <ul>
-  <li><a href="#1-nestjsschedule-패키지">1. @nestjs/schedule 패키지</a></li>
-  <li><a href="#2-태스크-스케줄링을-선언하는-방식">2. 태스크 스케줄링을 선언하는 방식</a>
-    <ul>
-      <li><a href="#21-크론-잡-선언-방식">2.1 크론 잡 선언 방식</a></li>
-      <li><a href="#22-인터벌-선언-방식">2.2 인터벌 선언 방식</a></li>
-      <li><a href="#23-타임아웃-선언-방식">2.3 타임아웃 선언 방식</a></li>
-    </ul>
-  </li>
-  <li><a href="#3-동적-태스크-스케줄링">3. 동적 태스크 스케줄링</a></li>
-</ul>
+      <h1 id="캐시">캐시</h1>
 
-<hr />
+<p>캐시는 값비싼 연산 결과 또는 자주 참조되는 데이터를 메모리 안에 두고 빠르게 처리될 수 있도록 하는 저장소이다.</p>
 
-<h1 id="1-nestjsschedule-패키지">1. @nestjs/schedule 패키지</h1>
+<h2 id="캐시-계층">캐시 계층</h2>
 
-<p>주기적으로 동일한 작업을 처리해야할 때 태스크 스케줄링을 통해 만들수 있다. Node.js에는 크론 기능을 하는 여러 라이브러리가 있고 Nestsms node-cron을 통합한 @nestjs/schedule 패키지를 제공한다.</p>
+<p>데이터가 잠시 보관되는 곳으로 데이터베이스보다 훨씬 빠르다. 캐시 계층을 두면 성능 개선과 데이터베이스 부하를 줄일 수 있다. 또한 캐시 계층의 규모를 독립적으로 확장시키는 것도 가능하다.
+<img src="https://velog.velcdn.com/images/naljajm/post/e4574b72-c4b2-4b38-983e-e21560d6b627/image.png" alt="" />
+웹 서버가 캐시에 데이터를 확인하고 있으면 리턴, 없다면 데이터베이스에서 데이터를 찾아 캐시에 저장한 뒤 리턴하는 전략을 읽기 주도형 캐시 전략(read-through caching strategy)라고 한다.
+이외에도 데이터 종류, 크기, 액세스 패턴에 맞는 다양한 캐시 전략이 있고 이를 확인해서 사용한다.</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm i <span class="nt">--save</span> @nestjs/schedule @types/cron
-</code></pre></div></div>
-
-<p>태스크 스케줄링은 ScheduleModule을 사용한다. 이 모듈을 AppModule에서 바로 사용해도 되지만 별도 모듈인 BatchModule에 작성한다.</p>
-
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Module</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">ScheduleModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/schedule</span><span class="dl">"</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">TaskService</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./task.service</span><span class="dl">"</span><span class="p">;</span>
-
-<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
-  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span><span class="nx">ScheduleModule</span><span class="p">.</span><span class="nx">forRoot</span><span class="p">()],</span>
-  <span class="na">providers</span><span class="p">:</span> <span class="p">[</span><span class="nx">TaskService</span><span class="p">],</span>
-<span class="p">})</span>
-<span class="k">export</span> <span class="kd">class</span> <span class="nx">BatchModule</span> <span class="p">{}</span>
-</code></pre></div></div>
-
-<h1 id="2-태스크-스케줄링을-선언하는-방식">2. 태스크 스케줄링을 선언하는 방식</h1>
-
-<h2 id="21-크론-잡-선언-방식">2.1 크론 잡 선언 방식</h2>
-
-<p>크론 잡 선언 방식은 @Cron 데커레이터를 선언한 메서드를 태스크로 구현하는 방식이다.</p>
-
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Injectable</span><span class="p">,</span> <span class="nx">Logger</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/common</span><span class="dl">'</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">Cron</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/schedule</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="p">@</span><span class="nd">Injectable</span><span class="p">()</span>
-<span class="k">export</span> <span class="kd">class</span> <span class="nx">TaskService</span> <span class="p">{</span>
-  <span class="kr">private</span> <span class="nx">readonly</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Logger</span><span class="p">(</span><span class="nx">TaskService</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
-
-  <span class="p">@</span><span class="nd">Cron</span><span class="p">(</span><span class="dl">'</span><span class="s1">* * * * * *</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">cronTask</span><span class="dl">'</span> <span class="p">})</span>
-  <span class="nx">handleCron</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Task Called!</span><span class="dl">'</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h2 id="22-인터벌-선언-방식">2.2 인터벌 선언 방식</h2>
-
-<p>@Interval 데커레이터를 사용하여 인터벌로 스케줄링을 할 수 있다.</p>
-
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Injectable</span><span class="p">,</span> <span class="nx">Logger</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/common</span><span class="dl">'</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">Cron</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/schedule</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="p">@</span><span class="nd">Injectable</span><span class="p">()</span>
-<span class="k">export</span> <span class="kd">class</span> <span class="nx">TaskService</span> <span class="p">{</span>
-  <span class="kr">private</span> <span class="nx">readonly</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Logger</span><span class="p">(</span><span class="nx">TaskService</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
-
-  <span class="p">@</span><span class="nd">Cron</span><span class="p">(</span><span class="dl">'</span><span class="s1">* * * * * *</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">cronTask</span><span class="dl">'</span> <span class="p">})</span>
-  <span class="nx">handleCron</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Task Called!</span><span class="dl">'</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="p">@</span><span class="nd">Interval</span><span class="p">(</span><span class="dl">'</span><span class="s1">intervalTask</span><span class="dl">'</span><span class="p">,</span> <span class="mi">3000</span><span class="p">)</span>   <span class="c1">// 앱 실행 후 3초 후에 처음 수행되며, 3초마다 반복</span>
-  <span class="nx">handleInterval</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Task Called!</span><span class="dl">'</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h2 id="23-타임아웃-선언-방식">2.3 타임아웃 선언 방식</h2>
-
-<p>앱이 실행된 후 태스크를 단 한번만 수행한다. @Timeout 데커레이터를 사용한다.</p>
-
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Injectable</span><span class="p">,</span> <span class="nx">Logger</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/common</span><span class="dl">'</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">Cron</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/schedule</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="p">@</span><span class="nd">Injectable</span><span class="p">()</span>
-<span class="k">export</span> <span class="kd">class</span> <span class="nx">TaskService</span> <span class="p">{</span>
-  <span class="kr">private</span> <span class="nx">readonly</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Logger</span><span class="p">(</span><span class="nx">TaskService</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
-
-  <span class="p">@</span><span class="nd">Cron</span><span class="p">(</span><span class="dl">'</span><span class="s1">* * * * * *</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">cronTask</span><span class="dl">'</span> <span class="p">})</span>
-  <span class="nx">handleCron</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Task Called!</span><span class="dl">'</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="p">@</span><span class="nd">Interval</span><span class="p">(</span><span class="dl">'</span><span class="s1">intervalTask</span><span class="dl">'</span><span class="p">,</span> <span class="mi">3000</span><span class="p">)</span>   <span class="c1">// 앱 실행 후 3초 후에 처음 수행되며, 3초마다 반복</span>
-  <span class="nx">handleInterval</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Task Called!</span><span class="dl">'</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="p">@</span><span class="nd">Timeout</span><span class="p">(</span><span class="dl">'</span><span class="s1">timeoutTask</span><span class="dl">'</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
-  <span class="nx">handleTimeout</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Task called by timeout</span><span class="dl">'</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h1 id="3-동적-태스크-스케줄링">3. 동적 태스크 스케줄링</h1>
-
-<p>앱 구동 중 특정 조건을 만족했을 때 태스크를 등록하도록 해보자. 이를 위해서는 태스크를 등록/해제할 방법이 필요하다. 동적 태스크 스케줄링은 SchedulerRegistry에서 제공하는 API를 사용한다.</p>
-
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Injectable</span><span class="p">,</span> <span class="nx">Logger</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/common</span><span class="dl">'</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">SchedulerRegistry</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/schedule</span><span class="dl">'</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">CronJob</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">cron</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="p">@</span><span class="nd">Injectable</span><span class="p">()</span>
-<span class="k">export</span> <span class="kd">class</span> <span class="nx">TaskService</span> <span class="p">{</span>
-  <span class="kr">private</span> <span class="nx">readonly</span> <span class="nx">logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Logger</span><span class="p">(</span><span class="nx">TaskService</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
-
-  <span class="kd">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">schedulerRegistry</span><span class="p">:</span> <span class="nx">SchedulerRegistry</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">addCronJob</span><span class="p">();</span>
-  <span class="p">}</span>
-
-  <span class="nx">addCronJob</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">name</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">cronSample</span><span class="dl">'</span><span class="p">;</span>
-
-    <span class="kd">const</span> <span class="nx">job</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CronJob</span><span class="p">(</span><span class="dl">'</span><span class="s1">* * * * * *</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="s2">`run! </span><span class="p">${</span><span class="nx">name</span><span class="p">}</span><span class="s2">`</span><span class="p">);</span>
-    <span class="p">});</span>
-
-    <span class="k">this</span><span class="p">.</span><span class="nx">schedulerRegistry</span><span class="p">.</span><span class="nx">addCronJob</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">job</span><span class="p">);</span>
-
-    <span class="k">this</span><span class="p">.</span><span class="nx">logger</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="s2">`job </span><span class="p">${</span><span class="nx">name</span><span class="p">}</span><span class="s2"> added!!`</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>이 상태에서는 아무런 동작을 하지 않는다. 등록된 크론 잡을 스케줄링으로 동작시키고 중지하는 기능을 가진 컨트롤러를 추가해보자.</p>
-
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Controller</span><span class="p">,</span> <span class="nx">Post</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/common</span><span class="dl">'</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">SchedulerRegistry</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@nestjs/schedule</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="p">@</span><span class="nd">Controller</span><span class="p">(</span><span class="dl">'</span><span class="s1">batches</span><span class="dl">'</span><span class="p">)</span>
-<span class="k">export</span> <span class="kd">class</span> <span class="nx">BatchController</span> <span class="p">{</span>
-  <span class="kd">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">scheduler</span><span class="p">:</span> <span class="nx">SchedulerRegistry</span><span class="p">)</span> <span class="p">{}</span>
-
-  <span class="p">@</span><span class="nd">Post</span><span class="p">(</span><span class="dl">'</span><span class="s1">/start</span><span class="dl">'</span><span class="p">)</span>
-  <span class="nx">start</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">job</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">scheduler</span><span class="p">.</span><span class="nx">getCronJob</span><span class="p">(</span><span class="dl">'</span><span class="s1">cronSample</span><span class="dl">'</span><span class="p">);</span>
-
-    <span class="nx">job</span><span class="p">.</span><span class="nx">start</span><span class="p">();</span>
-
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">start!! </span><span class="dl">'</span><span class="p">,</span> <span class="nx">job</span><span class="p">.</span><span class="nx">lastDate</span><span class="p">());</span>
-  <span class="p">}</span>
-
-  <span class="p">@</span><span class="nd">Post</span><span class="p">(</span><span class="dl">'</span><span class="s1">/stop</span><span class="dl">'</span><span class="p">)</span>
-  <span class="nx">stop</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">job</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">scheduler</span><span class="p">.</span><span class="nx">getCronJob</span><span class="p">(</span><span class="dl">'</span><span class="s1">cronSample</span><span class="dl">'</span><span class="p">);</span>
-
-    <span class="nx">job</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
-
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">stop!! </span><span class="dl">'</span><span class="p">,</span> <span class="nx">job</span><span class="p">.</span><span class="nx">lastDate</span><span class="p">());</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Module</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/common</span><span class="dl">"</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">ScheduleModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@nestjs/schedule</span><span class="dl">"</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">TaskService</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./task.service</span><span class="dl">"</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">BatchController</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./batch.controller</span><span class="dl">"</span><span class="p">;</span>
-
-<span class="p">@</span><span class="nd">Module</span><span class="p">({</span>
-  <span class="na">imports</span><span class="p">:</span> <span class="p">[</span><span class="nx">ScheduleModule</span><span class="p">.</span><span class="nx">forRoot</span><span class="p">()],</span>
-  <span class="na">providers</span><span class="p">:</span> <span class="p">[</span><span class="nx">TaskService</span><span class="p">],</span>
-  <span class="na">controllers</span><span class="p">:</span> <span class="p">[</span><span class="nx">BatchController</span><span class="p">],</span>
-<span class="p">})</span>
-<span class="k">export</span> <span class="kd">class</span> <span class="nx">BatchModule</span> <span class="p">{}</span>
-</code></pre></div></div>
-
-<hr />
-
-<p><em>본 포스트는 한용재 저자의 <strong>NestJS로 배우는 백엔드 프로그래밍</strong>을 기반으로 스터디하며 정리한 내용들입니다.</em></p>
+<h2 id="캐시-사용-시-유의할-점">캐시 사용 시 유의할 점</h2>
 
 <ul>
-  <li><a href="http://www.yes24.com/Product/Goods/115850682">NestJS로 배우는 백엔드 프로그래밍</a></li>
+  <li>쓰기 작업보다 읽기 작업이 빈번하게 발생한다면 캐시 사용을 고려해볼 수 있다.</li>
+  <li>캐시 데이터는 휘발성이기 때문에 영속적 보관이 필요한 데이터는 캐시에 두지 않는다.</li>
+  <li>적절한 캐시 데이터 만료 정책을 마련해야한다. 만료 기한이 너무 짧으면 캐시 데이터 갱신이 자주 일어나게 될 것이고 너무 길면 원본과 차이가 날 가능성이 높아진다.</li>
+  <li>데이터베이스 갱신과 캐시 갱신 연산이 단일 트랜잭션에서 수행되지 않으면 일관성이 깨질 수 있다. 또한 여러 지역에 걸쳐 시스템을 확장할때 캐시와 저장소 사이의 일관성을 유지하는 것은 어려운 문제이다.</li>
+  <li>캐시 서버를 한 대만 두는 경우 해당 서버는 단일 장애 지점이 된다. 이를 피하기 위해서는 캐시를 여러 지역에 걸쳐 분산시켜야 한다.</li>
+  <li>캐시 메모리가 너무 작으면 데이터가 너무 자주 캐시에서 밀려나기 때문에 캐시 성능이 떨어진다. 캐시 메모리를 과할당해서 보관될 데이터가 갑자기 늘어났을 때 생길 문제를 방지한다.</li>
+  <li>캐시가 꽉 찼을때 추가로 캐시에 데이터를 넣어야 할 경우 기존 데이터를 내보내는 데이터 방출 정책을 만들어야한다. 널리 쓰이는 것은 LRU(Least Recently Used) 이다. 다른 정책은 LFU(Least Frequently Used)나 FIFO(First In First Out) 등이 있다.</li>
+</ul>
+
+<h1 id="콘텐츠-전송-네트워크cdn">콘텐츠 전송 네트워크(CDN)</h1>
+
+<p>CDN은 정적 콘텐츠를 전송하는 데 쓰이는 지리적으로 분산된 서버 네트워크이다. 이미지, 비디오, CSS, Javascript 파일 등을 캐시한다.
+<img src="https://velog.velcdn.com/images/naljajm/post/bdff238d-8074-48b7-8c05-a2d660f14b2b/image.png" alt="" /></p>
+
+<ol>
+  <li>사용자가 image.png 요청</li>
+  <li>CDN 서버 캐시에 해당 이미지가 없는 경우 원본 서버에 요청해서 파일을 가져온다.</li>
+  <li>원본 서버가 CDN 서버에 이미지를 저장한다. 응답 HTTP 헤더에는 TTL(Time To Live)값이 들어있다.</li>
+  <li>CDN 서버는 파일을 캐시하고 사용자에게 반환한다. 이미지는 TTL 까지 캐시된다.</li>
+  <li>다른 사용자가 같은 이미지에 대한 요청을 CDN에 요청한다.</li>
+  <li>만료되지 않은 이미지에 대한 요청은 캐시를 통해 처리된다.</li>
+</ol>
+
+<h2 id="cdn-사용-시-고려해야-할-사항">CDN 사용 시 고려해야 할 사항</h2>
+
+<ul>
+  <li>비용 : 자주 사용되지 않는 콘텐츠를 캐싱하는 것은 이득이 작으므로 CDN에서 빼는 것을 고려한다.</li>
+  <li>적절한 만료 : Time-Sensitive 콘텐츠는 만료 시점을 잘 정해야한다.</li>
+  <li>CDN 장애 : CDN 자체가 죽엇을 경우 해당 문제를 감지하여 원본 서버로부터 직접 콘텐츠를 가져오도록 클라이언트를 구성하는 것이 필요할 수 있다.</li>
+  <li>Invalidation 방법 : 만료되지 않은 콘텐츠라 하더라도 CDN API, Object Versioning (콘텐츠 버전 지정, image.png?v=2)와 같은 방식으로 무효화를 한다.</li>
+</ul>
+
+<p>CDN과 캐시가 추가된 설계
+<img src="https://velog.velcdn.com/images/naljajm/post/6c4197ed-7ee2-4263-9f04-53e805bec5db/image.png" alt="" /></p>
+
+<hr />
+
+<p><em>본 포스트는 알렉스 쉬 저자의 <strong>가상 면접 사례로 배우는 대규모 시스템 설계 기초</strong>를 기반으로 스터디하며 정리한 내용들입니다.</em></p>
+
+<ul>
+  <li><a href="https://m.yes24.com/Goods/Detail/102819435">가상 면접 사례로 배우는 대규모 시스템 설계 기초</a></li>
 </ul>
 
       <br/>
@@ -456,12 +308,12 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
   <div class="share">
       <h2>Share this post</h2>
       <div class="share-body">
-        <a href="http://twitter.com/share?text=[NestJs] 태스크 스케줄링&amp;url=http://localhost:4000/dev/2024/03/03/16-nest-cron/"
+        <a href="http://twitter.com/share?text=[대규모 시스템 설계] 사용자 수에 따른 규모 확장성 - 캐시, CDN&amp;url=http://localhost:4000/dev/2024/03/23/23-system-design-item1-3/"
     onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
             <span class="icon-twitter">
             </span>
         </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/03/03/16-nest-cron/"
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/dev/2024/03/23/23-system-design-item1-3/"
     onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
             <span class="icon-facebook">
             </span>
@@ -551,22 +403,22 @@ on <a href="/tag/dev-nestjs/" data-flip="title">NestJs</a>
         
       
         
+          
+          
+        
         
           
 
 
 <li class="h4">
-  <a href="/dev/2024/03/23/23-system-design-item1-3/" data-flip="title">
-    <span>[대규모 시스템 설계] 사용자 수에 따른 규모 확장성 - 캐시, CDN</span>
+  <a href="/dev/2024/03/23/22-system-design-item1-2/" data-flip="title">
+    <span>[대규모 시스템 설계] 사용자 수에 따른 규모 확장성 - 규모 확장, 로드밸런서, 데이터베이스 다중화</span>
   </a>
   <small><time datetime="2024-03-23T00:00:00+09:00">
     2024-03-23
   </time></small>
 </li>
 
-        
-      
-        
         
       
     
