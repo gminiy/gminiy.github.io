@@ -5,9 +5,335 @@
     <description></description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 25 Mar 2024 19:37:20 +0900</pubDate>
-    <lastBuildDate>Mon, 25 Mar 2024 19:37:20 +0900</lastBuildDate>
+    <pubDate>Sun, 31 Mar 2024 22:56:03 +0900</pubDate>
+    <lastBuildDate>Sun, 31 Mar 2024 22:56:03 +0900</lastBuildDate>
     <generator>Jekyll v3.9.1</generator>
+    
+      <item>
+        <title>[MySQL] 인덱스: B-Tree 인덱스 - 1</title>
+        <description>&lt;h1 id=&quot;인덱스란&quot;&gt;인덱스란?&lt;/h1&gt;
+
+&lt;p&gt;책의 마지막에 있는 “찾아보기”가 인덱스에 비유된다면, 책의 &lt;strong&gt;내용&lt;/strong&gt;은 &lt;strong&gt;데이터 파일&lt;/strong&gt;이라고 볼 수 있다. 책의 찾아보기 페이지를 통해 알 수 있는 &lt;strong&gt;페이지 번호&lt;/strong&gt;는 데이터 파일에 저장된 &lt;strong&gt;레코드의 주소&lt;/strong&gt;에 비유될수 있다.&lt;/p&gt;
+
+&lt;p&gt;데이터베이스 테이블의 모든 데이터를 검색해서 결과를 가지고 오는 것은 시간이 오래걸린다. 그래서 &lt;strong&gt;칼럼의 값과 해당 레코드가 저장된 주소를 Key-Value로 인덱스&lt;/strong&gt;를 만들어 둔다.
+책의 찾아보기도 내용이 많아지면 검색어를 찾는데 시간이 걸리기 때문에 이름 순서대로 정렬해두는 것처럼 DBMS의 인덱스도 &lt;strong&gt;칼럼의 값을 주어진 순서로 미리 정렬&lt;/strong&gt;해서 보관한다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Sorted List: DBMS의 인덱스와 같은 자료구조, 저장되는 값을 항상 정렬된 상태로 유지하는 자료구조&lt;/li&gt;
+  &lt;li&gt;Array List: 데이터 파일과 같은 자료구조, 값을 저장되는 순서대로 그대로 유지하는 자료구조.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;SortedList 자료구조는 데이터가 저장될 때마다 정렬해야 하므로 저장하는 과정이 느리지만, 빨리 원하는 값을 찾아올 수 있다.
+&lt;strong&gt;DBMS의 인덱스도 인덱스가 많은 테이블은 WRITE 문장 (INSERT, UPDATE, DELETE)은 느려지지만 SELECT를 빠르게 처리할 수 있다.&lt;/strong&gt;
+테이블의 인덱스를 하나 더 추가할지 말지는 데이터의 저장 속도와 읽기속도 간의 타협을 찾아야 한다. 전부 인덱스로 생성하면 데이터 저장 성능이 떨어지고 인덱스 크기가 비대해져 역효과가 발생한다.&lt;/p&gt;
+
+&lt;p&gt;인덱스를 역할별로 구분한다면 Primary Key와 Secondary Key로 구분할 수 있다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Primary Key : 레코드를 대표하는 칼럼의 값으로 만들어진 인덱스. 레코드를 식별할 수 있는 기준값이기 때문에 식별자라고도 부른다. NULL이 허용이 안되며 중복이 허용되지 않는다.&lt;/li&gt;
+  &lt;li&gt;Secondary Key : PK를 제외한 모든 인덱스, 유니크 인덱스는 PK와 성격이 비슷하고 PK와 대체가 가능하기 때문에 대체 키라고도 부른다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;인덱스 저장 알고리즘별로 구분하는 것은 많지만 대표적으로 &lt;strong&gt;B-Tree 인덱스&lt;/strong&gt;와 &lt;strong&gt;Hash 인덱스&lt;/strong&gt;가 있다.&lt;/p&gt;
+
+&lt;p&gt;데이터 중복 허용 여부로 분류하면 Unique Index와 Non-Unique Index로 구분할 수 있다.
+실제 DBMS의 쿼리를 실행하는 옵티마이저는 유니크한 값인지에 따라 처리 방식의 변화가 많다. 이는 추후에 다룬다.&lt;/p&gt;
+
+&lt;p&gt;인덱스의 기능별로 분류한다면 전문 검색용 인덱스나 공간 검색용 인덱스 등을 예로 들 수 있다. 추후에 살펴본다.&lt;/p&gt;
+
+&lt;h1 id=&quot;b-tree-인덱스&quot;&gt;B-Tree 인덱스&lt;/h1&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;가장 일반적으로 사용되고 먼저 도입된 알고리즘이다.&lt;/li&gt;
+  &lt;li&gt;여러 가지 변형 형태 알고리즘이 있는데 B+-Tree, B*-Tree 가 사용된다.&lt;/li&gt;
+  &lt;li&gt;바이너리 트리가 아니라 &lt;strong&gt;Balanced Tree&lt;/strong&gt; 이다.&lt;/li&gt;
+  &lt;li&gt;칼럼의 값을 변형시키지 않고 인덱스 구조체 내에서 항상 정렬된 상태로 유지한다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;구조-및-특성&quot;&gt;구조 및 특성&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;트리 구조의 최상위에 “루트 노드”가 존재하고 그 하위에 “자식 노드”가 붙어 있는 형태&lt;/li&gt;
+  &lt;li&gt;가장 하위에 있는 노드를 “리프 노드”라 하고 중간을 “브랜치 노드”라고 한다.&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;리프 노드는 항상 실제 데이터 레코드를 찾아가기 위한 주소 값을 가지고 있다.
+&lt;img src=&quot;https://velog.velcdn.com/images/naljajm/post/8787731d-d0be-4eaa-b5ba-793fed6bce68/image.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;인덱스의 키값은 모두 정렬돼 있지만 데이터 파일의 레코드는 임의의 순서대로 저장돼 있다. (Insert 순서가 아니다)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;b-tree-인덱스-키-추가-및-삭제&quot;&gt;B-Tree 인덱스 키 추가 및 삭제&lt;/h2&gt;
+
+&lt;h3 id=&quot;인덱스-키-추가&quot;&gt;인덱스 키 추가&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;테이블의 스토리지 엔진에 따라 새로운 키값이 즉시 저장될 수도 있고 아닐 수도 있다.&lt;/li&gt;
+  &lt;li&gt;저장될 키값을 이용해 B-Tree 상의 적절한 위치를 검색&lt;/li&gt;
+  &lt;li&gt;위치가 결정되면 레코드의 키와 주소를 리프노드에 저장&lt;/li&gt;
+  &lt;li&gt;리프 노드가 꽉 찼다면 리프 노드 분리. 이는 상위 브랜치 노드까지 범위가 넓어지면서 비용이 많이 들게 됨&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;인덱스 추가로 인한 INSERT, UPDATE 문장이 받는 영향&lt;/p&gt;
+
+    &lt;ul&gt;
+      &lt;li&gt;테이블 레코드 추가 비용이 1이라고 가정&lt;/li&gt;
+      &lt;li&gt;인덱스 키를 추가하는 작업이 1 ~ 1.5 로 예측하는 것이 일반적&lt;/li&gt;
+      &lt;li&gt;인덱스가 3개 있다면, 인덱스가 하나도 없는 경우 1이고 3개인 경우 5.5 정도의 비용으로 예측&lt;/li&gt;
+      &lt;li&gt;비용의 대부분이 메모리나 CPU가 아니라 디스크로부터 인덱스 페이지를 읽고 쓰는 비용이기 때문에 시간이 오래걸림&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;MyISAM, Memory 스토리지 엔진 사용시 INSERT 문장 실행시 즉시 새로운 키값을 B-Tree 인덱스에 반영하기 때문에 키 추가 작업이 완료될때까지 쿼리 수행이 완료되지 않는다.&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;InnoDB 스토리지 엔진은 아래와 같이 상황을 판단하여 인덱스 키 추가 작업을 나중에 처리할지, 아니면 바로 처리할지 결정한다.&lt;/p&gt;
+
+    &lt;ul&gt;
+      &lt;li&gt;사용자 쿼리 실행&lt;/li&gt;
+      &lt;li&gt;버퍼 풀에 새로운 키값을 추가해야 할 페이지가 존재한다면 즉시 추가 작업 처리&lt;/li&gt;
+      &lt;li&gt;버퍼 풀에 리프 노드가 없다면 인서트 버퍼에 추가할 키값과 레코드 주소를 임시로 기록해 두고 작업 완료&lt;/li&gt;
+      &lt;li&gt;백그라운드 작업으로 인덱스 페이지를 읽을 때마다 인서트 버퍼에 머지할 인덱스 키값이 있는지 확인한 후 인다면 병합&lt;/li&gt;
+      &lt;li&gt;데이터베이스 서버 자원의 여유가 생기면 조금씩 머지함&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;인덱스-키-삭제&quot;&gt;인덱스 키 삭제&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;해당 키값이 저장된 리프 노드를 찾아 삭제 마크하면 작업 완료&lt;/li&gt;
+  &lt;li&gt;삭제된 인덱스 키 공간은 방치 혹은 재활용 할 수 있음.&lt;/li&gt;
+  &lt;li&gt;MySQL 5.5 이상 버전에서는 버퍼링되어 지연 처리 가능&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;인덱스-키-변경&quot;&gt;인덱스 키 변경&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;키값이 변경되는 경우 단순히 인덱스상의 키값만 변경하는 것은 불가능&lt;/li&gt;
+  &lt;li&gt;키값을 삭제한 후, 다시 새로운 키값을 추가하는 형태로 처리.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;인덱스-키-검색&quot;&gt;인덱스 키 검색&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;루트 노드부터 시작해서 브랜치 노드를 거쳐 리프 노드까지 이동하면서 비교 작업을 수행하는 &lt;strong&gt;트리 탐색&lt;/strong&gt;을 한다.&lt;/li&gt;
+  &lt;li&gt;100 % 일치 또는 값의 앞부분만 일치하는 경우에 사용할 수 있다.&lt;/li&gt;
+  &lt;li&gt;인덱스의 키값에 변형이 가해진 후 비교되는 경우에는 B-Tree의 빠른 검색 기능을 사용할 수 없다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;em&gt;본 포스트는 이성욱 저자의 &lt;strong&gt;Real MySQL&lt;/strong&gt;를 기반으로 스터디하며 정리한 내용들입니다.&lt;/em&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://m.yes24.com/Goods/Detail/6960931&quot;&gt;Real MySQL&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Sun, 31 Mar 2024 00:00:00 +0900</pubDate>
+        <link>http://localhost:4000/dev/2024/03/31/27-real-mysql-index-1/</link>
+        <guid isPermaLink="true">http://localhost:4000/dev/2024/03/31/27-real-mysql-index-1/</guid>
+        
+        <category>database</category>
+        
+        
+        <category>dev</category>
+        
+      </item>
+    
+      <item>
+        <title>[대규모 시스템 설계] 개략적인 규모 추정</title>
+        <description>&lt;h2 id=&quot;개략적인-규모-추정&quot;&gt;개략적인 규모 추정&lt;/h2&gt;
+
+&lt;p&gt;보편적으로 통용되는 성능 수치상에서 사고 실험을 행하여 추정치를 계산하는 행위로서, 어떤 설계가 요구사항에 부합할 것인지 보기 위한 것&lt;/p&gt;
+
+&lt;p&gt;개략적 규모 추정을 하기 위해 보편적으로 사용되는 수치들을 이해할 필요가 있다.&lt;/p&gt;
+
+&lt;h2 id=&quot;2의-제곱수&quot;&gt;2의 제곱수&lt;/h2&gt;
+
+&lt;p&gt;데이터 볼륨의 단위를 2의 제곱수로 표현하는 수치에 익숙해져야한다.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;2의 x제곱&lt;/th&gt;
+      &lt;th&gt;근사치&lt;/th&gt;
+      &lt;th&gt;이름&lt;/th&gt;
+      &lt;th&gt;축약형&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;10&lt;/td&gt;
+      &lt;td&gt;1천&lt;/td&gt;
+      &lt;td&gt;1Kilobyte&lt;/td&gt;
+      &lt;td&gt;1KB&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;20&lt;/td&gt;
+      &lt;td&gt;1백만&lt;/td&gt;
+      &lt;td&gt;1Megabyte&lt;/td&gt;
+      &lt;td&gt;1MB&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;30&lt;/td&gt;
+      &lt;td&gt;10억&lt;/td&gt;
+      &lt;td&gt;1Gigabyte&lt;/td&gt;
+      &lt;td&gt;1GB&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;40&lt;/td&gt;
+      &lt;td&gt;1조&lt;/td&gt;
+      &lt;td&gt;1Terabyte&lt;/td&gt;
+      &lt;td&gt;1TB&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;50&lt;/td&gt;
+      &lt;td&gt;1000조&lt;/td&gt;
+      &lt;td&gt;1Petabyte&lt;/td&gt;
+      &lt;td&gt;1PB&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&quot;모든-프로그래머가-알아야-하는-응답-지연-값&quot;&gt;모든 프로그래머가 알아야 하는 응답 지연 값&lt;/h2&gt;
+
+&lt;p&gt;구글 제프 딘이 2010년에 공개한 통상적인 컴퓨터에서 구현된 연산들의 응답지연 값&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;연산명&lt;/th&gt;
+      &lt;th&gt;시간&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;L1 캐시 참조&lt;/td&gt;
+      &lt;td&gt;0.5ns&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;분기 예측 오류(branch mispredict)&lt;/td&gt;
+      &lt;td&gt;5ns&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;L2 캐시 참조&lt;/td&gt;
+      &lt;td&gt;7ns&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;뮤텍스(mutex) 락/언락&lt;/td&gt;
+      &lt;td&gt;100ns&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;주 메모리 참조&lt;/td&gt;
+      &lt;td&gt;100ns&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Zippy로 1 KB 압축&lt;/td&gt;
+      &lt;td&gt;10,000ns = 10us&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;1 Gbps 네트워크로 2 KB 전송&lt;/td&gt;
+      &lt;td&gt;20,000ns = 10us&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;메모리에서 1 MB 순차적으로 read&lt;/td&gt;
+      &lt;td&gt;250,000ns = 250us&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;같은 데이터 센터 내에서 메시지 왕복 지연시간&lt;/td&gt;
+      &lt;td&gt;500,000ns = 500us&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;디스크 탐색(seek)&lt;/td&gt;
+      &lt;td&gt;10,000,000ns = 10ms&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;네트워크에서 1 MB 순차적으로 read&lt;/td&gt;
+      &lt;td&gt;10,000,000ns = 10ms&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;디스크에서 1 MB 순차적으로 read&lt;/td&gt;
+      &lt;td&gt;30,000,000ns = 30ms&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;한 패킷의 CA(캘리포니아)로부터 네덜란드까지의 왕복 지연 시간&lt;/td&gt;
+      &lt;td&gt;150,000,000ns = 150ms&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;이를 시각화한 도구
+&lt;img src=&quot;https://velog.velcdn.com/images/naljajm/post/f8de776d-b6f4-4342-a983-d9519ebfa811/image.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;결론&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;메모리는 빠르지만 디스크는 아직도 느리다.&lt;/li&gt;
+  &lt;li&gt;디스크 탐색(seek)은 가능한 피하라.&lt;/li&gt;
+  &lt;li&gt;단순한 압축 알고리즘은 빠르다.&lt;/li&gt;
+  &lt;li&gt;데이터를 인터넷으로 전상하기 전에 가능하면 압축하라.&lt;/li&gt;
+  &lt;li&gt;데이터 센터는 보통 여러 지역에 분산되어 있고, 센터들 간에 데이터를 주고받는 데는 시간이 걸린다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;가용성에-관계된-수치들&quot;&gt;가용성에 관계된 수치들&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;고가용성(high availability)은 시스템이 오랜 시간 동안 지속적으로 중단 없이 운영될 수 있는 능력을 지칭하는 용어.&lt;/li&gt;
+  &lt;li&gt;% 로 표시하고, 100%는 시스템이 단 한 번도 중단된 적이 없었음을 의미. 보통 99 ~ 100%이다.&lt;/li&gt;
+  &lt;li&gt;SLA(Service Level Agreement)는 서비스 사업자와 고객 사이에 맺어진 합의를 의미. 서비스 사업자가 제공하는 서비스의 가용시간이 공식적으로 기술되어 있음.&lt;/li&gt;
+  &lt;li&gt;9의 개수와 시스템 장애시간 사이의 관계
+&lt;img src=&quot;https://velog.velcdn.com/images/naljajm/post/b405216a-6641-47ca-a988-e71443ccacd1/image.png&quot; alt=&quot;&quot; /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;예제-트위터-qps와-저장소-요구량-추정&quot;&gt;예제: 트위터 QPS와 저장소 요구량 추정&lt;/h2&gt;
+
+&lt;h3 id=&quot;가정&quot;&gt;가정&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;MAU는 3억 명이다.&lt;/li&gt;
+  &lt;li&gt;50% 사용자가 트위터를 매일 사용&lt;/li&gt;
+  &lt;li&gt;평균적으로 각 사용자는 매일 2건 트윗을 올림&lt;/li&gt;
+  &lt;li&gt;미디어를 포함하는 트윗은 10%&lt;/li&gt;
+  &lt;li&gt;데이터는 5년간 보관&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;추정&quot;&gt;추정&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;QPS(Query Per Second)&lt;/strong&gt; 추정
+    &lt;ul&gt;
+      &lt;li&gt;DAU = 3억 x 50% = 1.5억
+        &lt;ul&gt;
+          &lt;li&gt;QPS = 1.5억 x 2 / 24시간 / 3600초 ~= 3,500&lt;/li&gt;
+          &lt;li&gt;최대 QPS = 2 x QPS ~= 7,000&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;미디어 저장을 위한 저장소 요구량
+    &lt;ul&gt;
+      &lt;li&gt;평균 트윗 크기: tweet_id 64B, 텍스트 150B, 미디어 1MB&lt;/li&gt;
+      &lt;li&gt;일간 미디어 저장소 요구량 : 1.5억(DAU) x 2(평균 2건 트윗) x 10% X 1MB = 30TB/일&lt;/li&gt;
+      &lt;li&gt;5년간 미디어 보관 요구량 : 30TB x 365 x 5 ~= 55PB&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;em&gt;본 포스트는 알렉스 쉬 저자의 &lt;strong&gt;가상 면접 사례로 배우는 대규모 시스템 설계 기초&lt;/strong&gt;를 기반으로 스터디하며 정리한 내용들입니다.&lt;/em&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://m.yes24.com/Goods/Detail/102819435&quot;&gt;가상 면접 사례로 배우는 대규모 시스템 설계 기초&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Sun, 31 Mar 2024 00:00:00 +0900</pubDate>
+        <link>http://localhost:4000/dev/2024/03/31/26-system-design-item2/</link>
+        <guid isPermaLink="true">http://localhost:4000/dev/2024/03/31/26-system-design-item2/</guid>
+        
+        <category>server</category>
+        
+        
+        <category>dev</category>
+        
+      </item>
     
       <item>
         <title>[대규모 시스템 설계] 사용자 수에 따른 규모 확장성 - 데이터베이스 규모 확장</title>
