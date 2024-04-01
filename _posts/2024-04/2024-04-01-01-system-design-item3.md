@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[대규모 시스템 설계] 개략적인 규모 추정"
+title: "[대규모 시스템 설계] 시스템 설계 면접 공략법"
 date: 2024-04-01
 categories: dev
 tags: server
